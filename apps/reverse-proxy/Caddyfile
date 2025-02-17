@@ -1,0 +1,13 @@
+zpi.localhost {
+    reverse_proxy /api/* {
+        to http://localhost:3000
+    }
+
+    handle {
+        reverse_proxy localhost:5173
+    }
+}
+
+mailbox.lms.localhost {
+	reverse_proxy localhost:8025
+}
