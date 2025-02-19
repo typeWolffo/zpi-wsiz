@@ -17,6 +17,9 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { StagingGuard } from './common/guards/staging.guard';
 import * as schema from './storage/schema';
 import { UserModule } from './user/user.module';
+import { MechanicModule } from './mechanic/mechanic.module';
+import { VehicleModule } from './vehicle/vehicle.module';
+import { RepairOrderModule } from './repair-order/repair-order.module';
 
 @Module({
   imports: [
@@ -61,6 +64,9 @@ import { UserModule } from './user/user.module';
     AuthModule,
     UserModule,
     EmailModule,
+    MechanicModule,
+    VehicleModule,
+    RepairOrderModule,
   ],
   controllers: [],
   providers: [

@@ -1,4 +1,5 @@
 import { render } from "@react-email/components";
+
 import { EmailContent } from "./email-content";
 
 export function emailTemplateFactory<T extends unknown[]>(

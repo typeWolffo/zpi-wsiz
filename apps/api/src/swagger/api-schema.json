@@ -263,14 +263,14 @@
         ]
       }
     },
-    "/api/user": {
+    "/api/user/{id}": {
       "get": {
         "operationId": "UserController_getUserById",
         "parameters": [
           {
             "name": "id",
             "required": true,
-            "in": "query",
+            "in": "path",
             "schema": {
               "format": "uuid",
               "type": "string"
@@ -298,7 +298,7 @@
           {
             "name": "id",
             "required": true,
-            "in": "query",
+            "in": "path",
             "schema": {
               "format": "uuid",
               "type": "string"
@@ -331,52 +331,24 @@
         ]
       },
       "delete": {
-        "operationId": "UserController_deleteBulkUsers",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DeleteBulkUsersBody"
-              }
+        "operationId": "UserController_deleteUser",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DeleteBulkUsersResponse"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "User"
-        ]
-      },
-      "post": {
-        "operationId": "UserController_createUser",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateUserBody"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CreateUserResponse"
+                  "$ref": "#/components/schemas/DeleteUserResponse"
                 }
               }
             }
@@ -387,14 +359,14 @@
         ]
       }
     },
-    "/api/user/details": {
+    "/api/user/details/{id}": {
       "get": {
         "operationId": "UserController_getUserDetails",
         "parameters": [
           {
-            "name": "userId",
+            "name": "id",
             "required": true,
-            "in": "query",
+            "in": "path",
             "schema": {
               "format": "uuid",
               "type": "string"
@@ -418,7 +390,17 @@
       },
       "patch": {
         "operationId": "UserController_upsertUserDetails",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -435,46 +417,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UpsertUserDetailsResponse"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "User"
-        ]
-      }
-    },
-    "/api/user/admin": {
-      "patch": {
-        "operationId": "UserController_adminUpdateUser",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AdminUpdateUserBody"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminUpdateUserResponse"
                 }
               }
             }
@@ -525,14 +467,64 @@
         ]
       }
     },
-    "/api/user/user": {
-      "delete": {
-        "operationId": "UserController_deleteUser",
+    "/api/user": {
+      "post": {
+        "operationId": "UserController_createUser",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateUserResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "User"
+        ]
+      }
+    },
+    "/api/mechanic/all": {
+      "get": {
+        "operationId": "MechanicController_getMechanics",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetMechanicsResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Mechanic"
+        ]
+      }
+    },
+    "/api/mechanic/{id}": {
+      "get": {
+        "operationId": "MechanicController_getMechanicById",
         "parameters": [
           {
             "name": "id",
             "required": true,
-            "in": "query",
+            "in": "path",
             "schema": {
               "format": "uuid",
               "type": "string"
@@ -544,14 +536,432 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DeleteUserResponse"
+                  "$ref": "#/components/schemas/GetMechanicByIdResponse"
                 }
               }
             }
           }
         },
         "tags": [
-          "User"
+          "Mechanic"
+        ]
+      },
+      "patch": {
+        "operationId": "MechanicController_updateMechanic",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMechanicBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateMechanicResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Mechanic"
+        ]
+      },
+      "delete": {
+        "operationId": "MechanicController_deleteMechanic",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteMechanicResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Mechanic"
+        ]
+      }
+    },
+    "/api/mechanic": {
+      "post": {
+        "operationId": "MechanicController_createMechanic",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMechanicBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateMechanicResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Mechanic"
+        ]
+      }
+    },
+    "/api/vehicle/all": {
+      "get": {
+        "operationId": "VehicleController_getVehicles",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetVehiclesResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Vehicle"
+        ]
+      }
+    },
+    "/api/vehicle/{id}": {
+      "get": {
+        "operationId": "VehicleController_getVehicleById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetVehicleByIdResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Vehicle"
+        ]
+      },
+      "patch": {
+        "operationId": "VehicleController_updateVehicle",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateVehicleBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateVehicleResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Vehicle"
+        ]
+      },
+      "delete": {
+        "operationId": "VehicleController_deleteVehicle",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteVehicleResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Vehicle"
+        ]
+      }
+    },
+    "/api/vehicle/customer/{customerId}": {
+      "get": {
+        "operationId": "VehicleController_getVehiclesByCustomerId",
+        "parameters": [
+          {
+            "name": "customerId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetVehiclesByCustomerIdResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Vehicle"
+        ]
+      }
+    },
+    "/api/vehicle": {
+      "post": {
+        "operationId": "VehicleController_createVehicle",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateVehicleBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateVehicleResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Vehicle"
+        ]
+      }
+    },
+    "/api/repair-order/all": {
+      "get": {
+        "operationId": "RepairOrderController_getRepairOrders",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetRepairOrdersResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "RepairOrder"
+        ]
+      }
+    },
+    "/api/repair-order/{id}": {
+      "get": {
+        "operationId": "RepairOrderController_getRepairOrderById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetRepairOrderByIdResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "RepairOrder"
+        ]
+      },
+      "patch": {
+        "operationId": "RepairOrderController_updateRepairOrder",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRepairOrderBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateRepairOrderResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "RepairOrder"
+        ]
+      },
+      "delete": {
+        "operationId": "RepairOrderController_deleteRepairOrder",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteRepairOrderResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "RepairOrder"
+        ]
+      }
+    },
+    "/api/repair-order": {
+      "post": {
+        "operationId": "RepairOrderController_createRepairOrder",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRepairOrderBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateRepairOrderResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "RepairOrder"
         ]
       }
     }
@@ -610,7 +1020,14 @@
                 "type": "string"
               },
               "archivedAt": {
-                "type": "string"
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               },
               "updatedAt": {
                 "type": "string"
@@ -679,7 +1096,14 @@
                 "type": "string"
               },
               "archivedAt": {
-                "type": "string"
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               },
               "updatedAt": {
                 "type": "string"
@@ -733,7 +1157,14 @@
                 "type": "string"
               },
               "archivedAt": {
-                "type": "string"
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               },
               "updatedAt": {
                 "type": "string"
@@ -832,7 +1263,14 @@
                   "type": "string"
                 },
                 "archivedAt": {
-                  "type": "string"
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
                 "updatedAt": {
                   "type": "string"
@@ -907,7 +1345,14 @@
                 "type": "string"
               },
               "archivedAt": {
-                "type": "string"
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               },
               "updatedAt": {
                 "type": "string"
@@ -1047,11 +1492,7 @@
                 "type": "string"
               },
               {
-                "const": "student",
-                "type": "string"
-              },
-              {
-                "const": "teacher",
+                "const": "employee",
                 "type": "string"
               }
             ]
@@ -1075,7 +1516,14 @@
                 "type": "string"
               },
               "archivedAt": {
-                "type": "string"
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               },
               "updatedAt": {
                 "type": "string"
@@ -1151,88 +1599,6 @@
           "data"
         ]
       },
-      "AdminUpdateUserBody": {
-        "type": "object",
-        "properties": {
-          "firstName": {
-            "type": "string"
-          },
-          "lastName": {
-            "type": "string"
-          },
-          "email": {
-            "format": "email",
-            "type": "string"
-          },
-          "role": {
-            "anyOf": [
-              {
-                "const": "admin",
-                "type": "string"
-              },
-              {
-                "const": "student",
-                "type": "string"
-              },
-              {
-                "const": "teacher",
-                "type": "string"
-              }
-            ]
-          },
-          "archived": {
-            "type": "boolean"
-          }
-        }
-      },
-      "AdminUpdateUserResponse": {
-        "type": "object",
-        "properties": {
-          "data": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "format": "uuid",
-                "type": "string"
-              },
-              "createdAt": {
-                "type": "string"
-              },
-              "archivedAt": {
-                "type": "string"
-              },
-              "updatedAt": {
-                "type": "string"
-              },
-              "email": {
-                "type": "string"
-              },
-              "firstName": {
-                "type": "string"
-              },
-              "lastName": {
-                "type": "string"
-              },
-              "role": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "id",
-              "createdAt",
-              "archivedAt",
-              "updatedAt",
-              "email",
-              "firstName",
-              "lastName",
-              "role"
-            ]
-          }
-        },
-        "required": [
-          "data"
-        ]
-      },
       "ChangePasswordBody": {
         "type": "object",
         "properties": {
@@ -1256,23 +1622,6 @@
         "type": "null"
       },
       "DeleteUserResponse": {
-        "type": "null"
-      },
-      "DeleteBulkUsersBody": {
-        "type": "object",
-        "properties": {
-          "userIds": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        },
-        "required": [
-          "userIds"
-        ]
-      },
-      "DeleteBulkUsersResponse": {
         "type": "null"
       },
       "CreateUserBody": {
@@ -1299,11 +1648,7 @@
                 "type": "string"
               },
               {
-                "const": "student",
-                "type": "string"
-              },
-              {
-                "const": "teacher",
+                "const": "employee",
                 "type": "string"
               }
             ]
@@ -1317,6 +1662,1208 @@
         ]
       },
       "CreateUserResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "message"
+            ]
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "GetMechanicsResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "allOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string"
+                    },
+                    "archivedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "updatedAt": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "type": "string"
+                    },
+                    "firstName": {
+                      "type": "string"
+                    },
+                    "lastName": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "createdAt",
+                    "archivedAt",
+                    "updatedAt",
+                    "email",
+                    "firstName",
+                    "lastName",
+                    "role"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string"
+                    },
+                    "archivedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "updatedAt": {
+                      "type": "string"
+                    },
+                    "userId": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "shiftStart": {
+                      "type": "string"
+                    },
+                    "shiftEnd": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "createdAt",
+                    "archivedAt",
+                    "updatedAt",
+                    "userId",
+                    "shiftStart",
+                    "shiftEnd"
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "GetMechanicByIdResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "allOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "createdAt": {
+                    "type": "string"
+                  },
+                  "archivedAt": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "updatedAt": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "firstName": {
+                    "type": "string"
+                  },
+                  "lastName": {
+                    "type": "string"
+                  },
+                  "role": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "createdAt",
+                  "archivedAt",
+                  "updatedAt",
+                  "email",
+                  "firstName",
+                  "lastName",
+                  "role"
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "createdAt": {
+                    "type": "string"
+                  },
+                  "archivedAt": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "updatedAt": {
+                    "type": "string"
+                  },
+                  "userId": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "shiftStart": {
+                    "type": "string"
+                  },
+                  "shiftEnd": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "createdAt",
+                  "archivedAt",
+                  "updatedAt",
+                  "userId",
+                  "shiftStart",
+                  "shiftEnd"
+                ]
+              }
+            ]
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "UpdateMechanicBody": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "archivedAt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "updatedAt": {
+            "type": "string"
+          },
+          "userId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "shiftStart": {
+            "type": "string"
+          },
+          "shiftEnd": {
+            "type": "string"
+          }
+        }
+      },
+      "UpdateMechanicResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string"
+              },
+              "archivedAt": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "updatedAt": {
+                "type": "string"
+              },
+              "userId": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "shiftStart": {
+                "type": "string"
+              },
+              "shiftEnd": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "createdAt",
+              "archivedAt",
+              "updatedAt",
+              "userId",
+              "shiftStart",
+              "shiftEnd"
+            ]
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "DeleteMechanicResponse": {
+        "type": "null"
+      },
+      "CreateMechanicBody": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "archivedAt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "updatedAt": {
+            "type": "string"
+          },
+          "userId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "shiftStart": {
+            "type": "string"
+          },
+          "shiftEnd": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "userId",
+          "shiftStart",
+          "shiftEnd"
+        ]
+      },
+      "CreateMechanicResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "message"
+            ]
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "GetVehiclesResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "allOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string"
+                    },
+                    "archivedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "updatedAt": {
+                      "type": "string"
+                    },
+                    "customerId": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "make": {
+                      "type": "string"
+                    },
+                    "model": {
+                      "type": "string"
+                    },
+                    "year": {
+                      "type": "string"
+                    },
+                    "vin": {
+                      "type": "string"
+                    },
+                    "registrationNumber": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "createdAt",
+                    "archivedAt",
+                    "updatedAt",
+                    "customerId",
+                    "make",
+                    "model",
+                    "year",
+                    "vin",
+                    "registrationNumber"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string"
+                    },
+                    "archivedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "updatedAt": {
+                      "type": "string"
+                    },
+                    "firstName": {
+                      "type": "string"
+                    },
+                    "lastName": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "type": "string"
+                    },
+                    "phoneNumber": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "createdAt",
+                    "archivedAt",
+                    "updatedAt",
+                    "firstName",
+                    "lastName",
+                    "email",
+                    "phoneNumber"
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "GetVehicleByIdResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "allOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "createdAt": {
+                    "type": "string"
+                  },
+                  "archivedAt": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "updatedAt": {
+                    "type": "string"
+                  },
+                  "customerId": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "make": {
+                    "type": "string"
+                  },
+                  "model": {
+                    "type": "string"
+                  },
+                  "year": {
+                    "type": "string"
+                  },
+                  "vin": {
+                    "type": "string"
+                  },
+                  "registrationNumber": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "createdAt",
+                  "archivedAt",
+                  "updatedAt",
+                  "customerId",
+                  "make",
+                  "model",
+                  "year",
+                  "vin",
+                  "registrationNumber"
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "createdAt": {
+                    "type": "string"
+                  },
+                  "archivedAt": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "updatedAt": {
+                    "type": "string"
+                  },
+                  "firstName": {
+                    "type": "string"
+                  },
+                  "lastName": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "phoneNumber": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "createdAt",
+                  "archivedAt",
+                  "updatedAt",
+                  "firstName",
+                  "lastName",
+                  "email",
+                  "phoneNumber"
+                ]
+              }
+            ]
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "GetVehiclesByCustomerIdResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "createdAt": {
+                  "type": "string"
+                },
+                "archivedAt": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "updatedAt": {
+                  "type": "string"
+                },
+                "customerId": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "make": {
+                  "type": "string"
+                },
+                "model": {
+                  "type": "string"
+                },
+                "year": {
+                  "type": "string"
+                },
+                "vin": {
+                  "type": "string"
+                },
+                "registrationNumber": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "createdAt",
+                "archivedAt",
+                "updatedAt",
+                "customerId",
+                "make",
+                "model",
+                "year",
+                "vin",
+                "registrationNumber"
+              ]
+            }
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "UpdateVehicleBody": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "archivedAt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "updatedAt": {
+            "type": "string"
+          },
+          "customerId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "make": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          },
+          "year": {
+            "type": "string"
+          },
+          "vin": {
+            "type": "string"
+          },
+          "registrationNumber": {
+            "type": "string"
+          }
+        }
+      },
+      "UpdateVehicleResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string"
+              },
+              "archivedAt": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "updatedAt": {
+                "type": "string"
+              },
+              "customerId": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "make": {
+                "type": "string"
+              },
+              "model": {
+                "type": "string"
+              },
+              "year": {
+                "type": "string"
+              },
+              "vin": {
+                "type": "string"
+              },
+              "registrationNumber": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "createdAt",
+              "archivedAt",
+              "updatedAt",
+              "customerId",
+              "make",
+              "model",
+              "year",
+              "vin",
+              "registrationNumber"
+            ]
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "DeleteVehicleResponse": {
+        "type": "null"
+      },
+      "CreateVehicleBody": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "archivedAt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "updatedAt": {
+            "type": "string"
+          },
+          "customerId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "make": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          },
+          "year": {
+            "type": "string"
+          },
+          "vin": {
+            "type": "string"
+          },
+          "registrationNumber": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "customerId",
+          "make",
+          "model",
+          "year",
+          "vin",
+          "registrationNumber"
+        ]
+      },
+      "CreateVehicleResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "message"
+            ]
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "GetRepairOrdersResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "createdAt": {
+                  "type": "string"
+                },
+                "archivedAt": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "updatedAt": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "assignedMechanicId": {
+                  "anyOf": [
+                    {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "vehicleId": {
+                  "anyOf": [
+                    {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "createdAt",
+                "archivedAt",
+                "updatedAt",
+                "description",
+                "assignedMechanicId",
+                "vehicleId"
+              ]
+            }
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "GetRepairOrderByIdResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string"
+              },
+              "archivedAt": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "updatedAt": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "assignedMechanicId": {
+                "anyOf": [
+                  {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "vehicleId": {
+                "anyOf": [
+                  {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "createdAt",
+              "archivedAt",
+              "updatedAt",
+              "description",
+              "assignedMechanicId",
+              "vehicleId"
+            ]
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "UpdateRepairOrderBody": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "archivedAt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "updatedAt": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "assignedMechanicId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "vehicleId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "UpdateRepairOrderResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string"
+              },
+              "archivedAt": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "updatedAt": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "assignedMechanicId": {
+                "anyOf": [
+                  {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "vehicleId": {
+                "anyOf": [
+                  {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "createdAt",
+              "archivedAt",
+              "updatedAt",
+              "description",
+              "assignedMechanicId",
+              "vehicleId"
+            ]
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "DeleteRepairOrderResponse": {
+        "type": "null"
+      },
+      "CreateRepairOrderBody": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "archivedAt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "updatedAt": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "assignedMechanicId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "vehicleId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "description"
+        ]
+      },
+      "CreateRepairOrderResponse": {
         "type": "object",
         "properties": {
           "data": {

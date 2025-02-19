@@ -6,11 +6,14 @@
     "build": "cross-env NODE_ENV=production react-router build",
     "dev": "react-router dev",
     "start": "cross-env NODE_ENV=production react-router-serve ./build/server/index.js",
-    "typecheck": "react-router typegen && tsc"
+    "typecheck": "react-router typegen && tsc",
+    "generate:client": "swagger-typescript-api -p ../api/src/swagger/api-schema.json -o ./app/api --axios --name generated-api.ts --api-class-name API"
   },
   "dependencies": {
     "@react-router/node": "7.0.2",
     "@react-router/serve": "7.0.2",
+    "@types/axios": "0.14.4",
+    "axios": "1.7.9",
     "isbot": "5.1.17",
     "react": "19.0.0",
     "react-dom": "19.0.0",
@@ -24,6 +27,7 @@
     "autoprefixer": "10.4.20",
     "cross-env": "7.0.3",
     "postcss": "8.4.49",
+    "swagger-typescript-api": "13.0.12",
     "tailwindcss": "3.4.16",
     "typescript": "5.7.2",
     "vite": "5.4.11",
