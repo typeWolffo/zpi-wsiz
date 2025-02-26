@@ -286,14 +286,6 @@ export class UserService {
         from: process.env.SES_EMAIL || '',
       });
 
-      if (
-        USER_ROLES.TEACHER === createdUser.role ||
-        USER_ROLES.ADMIN === createdUser.role
-      )
-        await trx
-          .insert(userDetails)
-          .values({ userId: createdUser.id, contactEmail: createdUser.email });
-
       return createdUser;
     });
   }
