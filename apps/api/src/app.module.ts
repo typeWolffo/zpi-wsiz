@@ -20,6 +20,7 @@ import { UserModule } from './user/user.module';
 import { MechanicModule } from './mechanic/mechanic.module';
 import { VehicleModule } from './vehicle/vehicle.module';
 import { RepairOrderModule } from './repair-order/repair-order.module';
+import { CustomerModule } from './customer/customer.module';
 
 @Module({
   imports: [
@@ -67,6 +68,7 @@ import { RepairOrderModule } from './repair-order/repair-order.module';
     MechanicModule,
     VehicleModule,
     RepairOrderModule,
+    CustomerModule,
   ],
   controllers: [],
   providers: [

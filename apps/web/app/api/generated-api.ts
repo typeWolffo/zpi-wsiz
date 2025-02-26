@@ -536,6 +536,82 @@ export interface CreateRepairOrderResponse {
   };
 }
 
+export interface GetCustomersResponse {
+  data: {
+    /** @format uuid */
+    id: string;
+    createdAt: string;
+    archivedAt: string | null;
+    updatedAt: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phoneNumber: string | null;
+  }[];
+}
+
+export interface GetCustomerByIdResponse {
+  data: {
+    /** @format uuid */
+    id: string;
+    createdAt: string;
+    archivedAt: string | null;
+    updatedAt: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phoneNumber: string | null;
+  };
+}
+
+export interface UpdateCustomerBody {
+  /** @format uuid */
+  id?: string;
+  createdAt?: string;
+  archivedAt?: string | null;
+  updatedAt?: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phoneNumber?: string | null;
+}
+
+export interface UpdateCustomerResponse {
+  data: {
+    /** @format uuid */
+    id: string;
+    createdAt: string;
+    archivedAt: string | null;
+    updatedAt: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phoneNumber: string | null;
+  };
+}
+
+export type DeleteCustomerResponse = null;
+
+export interface CreateCustomerBody {
+  /** @format uuid */
+  id?: string;
+  createdAt?: string;
+  archivedAt?: string | null;
+  updatedAt?: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber?: string | null;
+}
+
+export interface CreateCustomerResponse {
+  data: {
+    /** @format uuid */
+    id: string;
+    message: string;
+  };
+}
+
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, HeadersDefaults, ResponseType } from "axios";
 import axios from "axios";
 
@@ -1197,6 +1273,85 @@ export class API<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     repairOrderControllerCreateRepairOrder: (data: CreateRepairOrderBody, params: RequestParams = {}) =>
       this.request<CreateRepairOrderResponse, any>({
         path: `/api/repair-order`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Customer
+     * @name CustomerControllerGetCustomers
+     * @request GET:/api/customer/all
+     */
+    customerControllerGetCustomers: (params: RequestParams = {}) =>
+      this.request<GetCustomersResponse, any>({
+        path: `/api/customer/all`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Customer
+     * @name CustomerControllerGetCustomerById
+     * @request GET:/api/customer/{id}
+     */
+    customerControllerGetCustomerById: (id: string, params: RequestParams = {}) =>
+      this.request<GetCustomerByIdResponse, any>({
+        path: `/api/customer/${id}`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Customer
+     * @name CustomerControllerUpdateCustomer
+     * @request PATCH:/api/customer/{id}
+     */
+    customerControllerUpdateCustomer: (id: string, data: UpdateCustomerBody, params: RequestParams = {}) =>
+      this.request<UpdateCustomerResponse, any>({
+        path: `/api/customer/${id}`,
+        method: "PATCH",
+        body: data,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Customer
+     * @name CustomerControllerDeleteCustomer
+     * @request DELETE:/api/customer/{id}
+     */
+    customerControllerDeleteCustomer: (id: string, params: RequestParams = {}) =>
+      this.request<DeleteCustomerResponse, any>({
+        path: `/api/customer/${id}`,
+        method: "DELETE",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Customer
+     * @name CustomerControllerCreateCustomer
+     * @request POST:/api/customer
+     */
+    customerControllerCreateCustomer: (data: CreateCustomerBody, params: RequestParams = {}) =>
+      this.request<CreateCustomerResponse, any>({
+        path: `/api/customer`,
         method: "POST",
         body: data,
         type: ContentType.Json,
