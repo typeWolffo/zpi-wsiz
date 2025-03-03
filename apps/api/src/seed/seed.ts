@@ -141,6 +141,8 @@ async function main() {
             ? insertedMechanics[0].id
             : null,
           vehicleId: insertedVehicles[0].id,
+          startDate: '2025-03-01T08:00:00.000Z',
+          endDate: '2022-03-01T10:00:00.000Z',
         },
         {
           description: 'Naprawa silnika',
@@ -148,6 +150,8 @@ async function main() {
             ? insertedMechanics[0].id
             : null,
           vehicleId: insertedVehicles[1].id,
+          startDate: '2025-03-01T12:00:00.000Z',
+          endDate: '2022-03-02T14:00:00.000Z',
         },
       ])
       .returning();

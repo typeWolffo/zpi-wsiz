@@ -17,6 +17,8 @@ export class RepairOrderService {
         description: repairOrders.description,
         assignedMechanicId: repairOrders.assignedMechanicId,
         vehicleId: repairOrders.vehicleId,
+        startDate: repairOrders.startDate,
+        endDate: repairOrders.endDate,
         // Vehicle data
         make: vehicles.make,
         model: vehicles.model,
@@ -44,6 +46,8 @@ export class RepairOrderService {
         description: repairOrders.description,
         assignedMechanicId: repairOrders.assignedMechanicId,
         vehicleId: repairOrders.vehicleId,
+        startDate: repairOrders.startDate,
+        endDate: repairOrders.endDate,
         // Vehicle data
         make: vehicles.make,
         model: vehicles.model,
@@ -74,6 +78,8 @@ export class RepairOrderService {
       description?: string;
       assignedMechanicId?: UUIDType | null;
       vehicleId?: UUIDType | null;
+      startDate?: string;
+      endDate?: string;
     },
   ) {
     const [existingRepairOrder] = await this.db
@@ -109,6 +115,8 @@ export class RepairOrderService {
     description: string;
     assignedMechanicId?: UUIDType | null;
     vehicleId?: UUIDType | null;
+    startDate: string;
+    endDate: string;
   }) {
     const [createdRepairOrder] = await this.db
       .insert(repairOrders)

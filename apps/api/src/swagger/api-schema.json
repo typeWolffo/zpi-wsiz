@@ -2751,6 +2751,12 @@
                       "type": "null"
                     }
                   ]
+                },
+                "startDate": {
+                  "type": "string"
+                },
+                "endDate": {
+                  "type": "string"
                 }
               },
               "required": [
@@ -2760,7 +2766,9 @@
                 "updatedAt",
                 "description",
                 "assignedMechanicId",
-                "vehicleId"
+                "vehicleId",
+                "startDate",
+                "endDate"
               ]
             }
           }
@@ -2819,6 +2827,12 @@
                     "type": "null"
                   }
                 ]
+              },
+              "startDate": {
+                "type": "string"
+              },
+              "endDate": {
+                "type": "string"
               }
             },
             "required": [
@@ -2828,7 +2842,9 @@
               "updatedAt",
               "description",
               "assignedMechanicId",
-              "vehicleId"
+              "vehicleId",
+              "startDate",
+              "endDate"
             ]
           }
         },
@@ -2883,6 +2899,12 @@
                 "type": "null"
               }
             ]
+          },
+          "startDate": {
+            "type": "string"
+          },
+          "endDate": {
+            "type": "string"
           }
         }
       },
@@ -2936,6 +2958,12 @@
                     "type": "null"
                   }
                 ]
+              },
+              "startDate": {
+                "type": "string"
+              },
+              "endDate": {
+                "type": "string"
               }
             },
             "required": [
@@ -2945,7 +2973,9 @@
               "updatedAt",
               "description",
               "assignedMechanicId",
-              "vehicleId"
+              "vehicleId",
+              "startDate",
+              "endDate"
             ]
           }
         },
@@ -3003,10 +3033,18 @@
                 "type": "null"
               }
             ]
+          },
+          "startDate": {
+            "type": "string"
+          },
+          "endDate": {
+            "type": "string"
           }
         },
         "required": [
-          "description"
+          "description",
+          "startDate",
+          "endDate"
         ]
       },
       "CreateRepairOrderResponse": {

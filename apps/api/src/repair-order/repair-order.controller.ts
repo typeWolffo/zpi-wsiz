@@ -112,6 +112,8 @@ export class RepairOrderController {
       description: string;
       assignedMechanicId?: UUIDType | null;
       vehicleId?: UUIDType | null;
+      startDate: string;
+      endDate: string;
     },
   ) {
     const { id } = await this.repairOrderService.createRepairOrder(data);
