@@ -28,7 +28,21 @@ import {
 } from 'drizzle-typebox';
 import { repairOrders } from 'src/storage/schema';
 
-const repairOrderSelectSchema = createSelectSchema(repairOrders);
+const repairOrderSelectBaseSchema = createSelectSchema(repairOrders);
+const repairOrderSelectSchema = Type.Composite([
+  repairOrderSelectBaseSchema,
+  Type.Object({
+    make: Type.String(),
+    model: Type.String(),
+    year: Type.String(),
+    vin: Type.String(),
+    registrationNumber: Type.String(),
+    customerFirstName: Type.String(),
+    customerLastName: Type.String(),
+    customerEmail: Type.String(),
+    customerPhoneNumber: Type.String(),
+  }),
+]);
 const repairOrderInsertSchema = createInsertSchema(repairOrders);
 const repairOrderUpdateSchema = createUpdateSchema(repairOrders);
 
@@ -63,7 +77,7 @@ export class RepairOrderController {
   @Patch(':id')
   @Roles(USER_ROLES.ADMIN, USER_ROLES.EMPLOYEE)
   @Validate({
-    response: baseResponse(repairOrderSelectSchema),
+    response: baseResponse(repairOrderUpdateSchema),
     request: [
       { type: 'param', name: 'id', schema: UUIDSchema, required: true },
       { type: 'body', schema: repairOrderUpdateSchema },
@@ -76,6 +90,8 @@ export class RepairOrderController {
       description?: string;
       assignedMechanicId?: UUIDType | null;
       vehicleId?: UUIDType | null;
+      startDate?: string;
+      endDate?: string;
     },
   ) {
     const updatedRepairOrder = await this.repairOrderService.updateRepairOrder(

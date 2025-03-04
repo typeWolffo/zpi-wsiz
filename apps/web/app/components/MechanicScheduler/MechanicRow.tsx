@@ -14,7 +14,7 @@ export const MechanicRow: React.FC<IMechanicRowProps> = ({ mechanic, appointment
 
   return (
     <div className="relative flex h-12 items-center border-b border-gray-200">
-      <div className="flex h-full w-24 items-center border-r border-gray-300 px-2 font-medium text-gray-700">
+      <div className="flex h-full w-24 items-center border-r border-gray-300 px-2 font-medium capitalize text-gray-700">
         {mechanic.firstName} {mechanic.lastName}
       </div>
       <div
@@ -35,6 +35,8 @@ export const MechanicRow: React.FC<IMechanicRowProps> = ({ mechanic, appointment
             customerName={appointment.customerName}
             registrationNumber={appointment.registrationNumber}
             onResize={onResize}
+            startDate={appointment.startDate}
+            endDate={appointment.endDate}
           />
         ))}
       </div>

@@ -1,6 +1,6 @@
 import { useDraggable } from "@dnd-kit/core";
 import { useState, useRef } from "react";
-import { calculateAppointmentStyle } from "./helpers";
+import { calculateAppointmentStyle, isMultiDayAppointment } from "./helpers";
 import type { IAppointmentProps } from "./types";
 
 export const Appointment: React.FC<IAppointmentProps> = ({
@@ -22,9 +22,22 @@ export const Appointment: React.FC<IAppointmentProps> = ({
   const [initialWidth, setInitialWidth] = useState<number | null>(null);
   const appointmentRef = useRef<HTMLDivElement>(null);
 
+  const isMultiDay =
+    startDate &&
+    endDate &&
+    isMultiDayAppointment({
+      id,
+      car,
+      start,
+      duration,
+      color,
+      startDate,
+      endDate,
+    });
+
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: id,
-    data: { type: "appointment", id },
+    data: { type: "appointment", id, isMultiDay },
   });
 
   const transformStyle = transform
@@ -33,7 +46,6 @@ export const Appointment: React.FC<IAppointmentProps> = ({
       }
     : {};
 
-  // Rozpoczynamy zmianę rozmiaru
   const handleResizeStart = (e: React.MouseEvent) => {
     e.stopPropagation(); // Zapobiegamy propagacji do DnD
 
@@ -129,9 +141,27 @@ export const Appointment: React.FC<IAppointmentProps> = ({
     registrationNumber ? `Nr rej.: ${registrationNumber}` : "",
     startDate ? `Początek: ${formatDate(startDate)}` : "",
     endDate ? `Koniec: ${formatDate(endDate)}` : "",
+    isMultiDay ? "Naprawa wielodniowa" : "",
   ]
     .filter(Boolean)
     .join("\n");
+
+  console.log({ startDate, endDate, isMultiDay });
+
+  // Dodatkowe style dla napraw wielodniowych
+  const multiDayStyles = isMultiDay
+    ? {
+        borderLeft: startDate && new Date(startDate).getHours() > 7 ? "4px solid white" : "none",
+        borderRight: endDate && new Date(endDate).getHours() < 18 ? "4px solid white" : "none",
+        background: `repeating-linear-gradient(
+      45deg,
+      ${color},
+      ${color} 10px,
+      ${color}dd 10px,
+      ${color}dd 20px
+    )`,
+      }
+    : {};
 
   return (
     <div
@@ -143,6 +173,7 @@ export const Appointment: React.FC<IAppointmentProps> = ({
       style={{
         ...style,
         ...transformStyle,
+        ...multiDayStyles,
         position: "absolute",
         backgroundColor: color || "#3b82f6",
         zIndex: isResizing ? 20 : 10,
@@ -153,7 +184,10 @@ export const Appointment: React.FC<IAppointmentProps> = ({
       {...(isResizing ? {} : attributes)}
       {...(isResizing ? {} : listeners)}
     >
-      <span className="truncate">{car}</span>
+      <span className="truncate">
+        {car}
+        {isMultiDay && <span className="ml-1 text-xs">[wielodniowa]</span>}
+      </span>
       <div
         className="absolute right-0 top-0 h-full w-2 cursor-ew-resize hover:bg-white hover:bg-opacity-20"
         onMouseDown={handleResizeStart}

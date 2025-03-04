@@ -477,6 +477,15 @@ export interface GetRepairOrdersResponse {
     vehicleId: string | null;
     startDate: string;
     endDate: string;
+    make: string;
+    model: string;
+    year: string;
+    vin: string;
+    registrationNumber: string;
+    customerFirstName: string;
+    customerLastName: string;
+    customerEmail: string;
+    customerPhoneNumber: string;
   }[];
 }
 
@@ -492,6 +501,15 @@ export interface GetRepairOrderByIdResponse {
     vehicleId: string | null;
     startDate: string;
     endDate: string;
+    make: string;
+    model: string;
+    year: string;
+    vin: string;
+    registrationNumber: string;
+    customerFirstName: string;
+    customerLastName: string;
+    customerEmail: string;
+    customerPhoneNumber: string;
   };
 }
 
@@ -520,6 +538,15 @@ export interface UpdateRepairOrderResponse {
     vehicleId: string | null;
     startDate: string;
     endDate: string;
+    make: string;
+    model: string;
+    year: string;
+    vin: string;
+    registrationNumber: string;
+    customerFirstName: string;
+    customerLastName: string;
+    customerEmail: string;
+    customerPhoneNumber: string;
   };
 }
 
