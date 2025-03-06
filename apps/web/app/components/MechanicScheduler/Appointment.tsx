@@ -8,19 +8,99 @@ export const Appointment: React.FC<IAppointmentProps> = ({
   car,
   start,
   duration,
-  color,
+  color = "#3b82f6",
   description,
   customerName,
   registrationNumber,
   startDate,
   endDate,
+  mechanicId,
   onResize,
+  onClick,
 }) => {
-  const style = calculateAppointmentStyle(start, duration);
   const [isResizing, setIsResizing] = useState(false);
   const [startResizeX, setStartResizeX] = useState<number | null>(null);
   const [initialWidth, setInitialWidth] = useState<number | null>(null);
   const appointmentRef = useRef<HTMLDivElement>(null);
+
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id,
+    data: { type: "appointment", id, mechanicId },
+  });
+
+  const handleClick = (e: React.MouseEvent) => {
+    // Prevent click when dragging or resizing
+    if (transform || isResizing) return;
+    onClick(id);
+  };
+
+  const style = {
+    ...calculateAppointmentStyle(start, duration),
+    backgroundColor: color,
+    transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
+  };
+
+  const handleResizeStart = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent drag start
+
+    if (appointmentRef.current) {
+      setIsResizing(true);
+      setStartResizeX(e.clientX);
+      setInitialWidth(appointmentRef.current.getBoundingClientRect().width);
+
+      window.addEventListener("mousemove", handleResizeMove);
+      window.addEventListener("mouseup", handleResizeEnd);
+    }
+  };
+
+  const handleResizeMove = (e: MouseEvent) => {
+    if (isResizing && startResizeX !== null && initialWidth !== null && appointmentRef.current) {
+      const deltaX = e.clientX - startResizeX;
+      const containerWidth =
+        appointmentRef.current.parentElement?.getBoundingClientRect().width || 1;
+
+      // Calculate percentage of day
+      const deltaPercentage = (deltaX / containerWidth) * 100;
+
+      // Convert to minutes (assuming 11-hour day from 7:00 to 18:00 = 660 minutes)
+      const deltaMinutes = Math.round((deltaPercentage / 100) * 660);
+
+      // Round to nearest 15 minutes
+      const roundedDeltaMinutes = Math.round(deltaMinutes / 15) * 15;
+
+      // Calculate new duration (minimum 15 minutes)
+      const newDuration = Math.max(15, duration + roundedDeltaMinutes);
+
+      // Update width during drag
+      const newWidth = initialWidth + deltaX;
+      appointmentRef.current.style.width = `${Math.max(30, newWidth)}px`;
+    }
+  };
+
+  const handleResizeEnd = (e: MouseEvent) => {
+    if (isResizing && startResizeX !== null && initialWidth !== null && appointmentRef.current) {
+      const deltaX = e.clientX - startResizeX;
+      const containerWidth =
+        appointmentRef.current.parentElement?.getBoundingClientRect().width || 1;
+
+      const deltaPercentage = (deltaX / containerWidth) * 100;
+      const deltaMinutes = Math.round((deltaPercentage / 100) * 660);
+      const roundedDeltaMinutes = Math.round(deltaMinutes / 15) * 15;
+      const newDuration = Math.max(15, duration + roundedDeltaMinutes);
+
+      // Call parent's resize handler
+      onResize(id, newDuration);
+
+      // Reset styles and state
+      appointmentRef.current.style.width = "";
+      setIsResizing(false);
+      setStartResizeX(null);
+      setInitialWidth(null);
+
+      window.removeEventListener("mousemove", handleResizeMove);
+      window.removeEventListener("mouseup", handleResizeEnd);
+    }
+  };
 
   const isMultiDay =
     startDate &&
@@ -35,93 +115,6 @@ export const Appointment: React.FC<IAppointmentProps> = ({
       endDate,
     });
 
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
-    id: id,
-    data: { type: "appointment", id, isMultiDay },
-  });
-
-  const transformStyle = transform
-    ? {
-        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-      }
-    : {};
-
-  const handleResizeStart = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Zapobiegamy propagacji do DnD
-
-    if (appointmentRef.current) {
-      setIsResizing(true);
-      setStartResizeX(e.clientX);
-      setInitialWidth(appointmentRef.current.getBoundingClientRect().width);
-
-      // Dodajemy event listenery do window
-      window.addEventListener("mousemove", handleResizeMove);
-      window.addEventListener("mouseup", handleResizeEnd);
-    }
-  };
-
-  // Obsługujemy ruch podczas zmiany rozmiaru
-  const handleResizeMove = (e: MouseEvent) => {
-    if (isResizing && startResizeX !== null && initialWidth !== null) {
-      const deltaX = e.clientX - startResizeX;
-      const containerWidth =
-        appointmentRef.current?.parentElement?.getBoundingClientRect().width || 1;
-
-      // Obliczamy jaki procent dnia reprezentuje zmiana w pikselach
-      const deltaPercentage = (deltaX / containerWidth) * 100;
-
-      // Obliczamy, ile minut to zmiana
-      const deltaMinutes = Math.round((deltaPercentage / 100) * 660);
-
-      // Zaokrąglamy do najbliższych 15 minut
-      const roundedDeltaMinutes = Math.round(deltaMinutes / 15) * 15;
-
-      // Obliczamy nową długość (minimalnie 15 minut)
-      const newDuration = Math.max(15, duration + roundedDeltaMinutes);
-
-      // Aktualizujemy tylko styl lokalnie podczas przeciągania
-      if (appointmentRef.current) {
-        const newWidth = initialWidth + deltaX;
-        appointmentRef.current.style.width = `${Math.max(30, newWidth)}px`;
-      }
-    }
-  };
-
-  // Kończymy zmianę rozmiaru i zapisujemy zmiany
-  const handleResizeEnd = (e: MouseEvent) => {
-    if (isResizing && startResizeX !== null && initialWidth !== null && appointmentRef.current) {
-      const deltaX = e.clientX - startResizeX;
-      const containerWidth =
-        appointmentRef.current.parentElement?.getBoundingClientRect().width || 1;
-
-      // Obliczamy jaki procent dnia reprezentuje zmiana w pikselach
-      const deltaPercentage = (deltaX / containerWidth) * 100;
-
-      // Obliczamy, ile minut to zmiana
-      const deltaMinutes = Math.round((deltaPercentage / 100) * 660);
-
-      // Zaokrąglamy do najbliższych 15 minut
-      const roundedDeltaMinutes = Math.round(deltaMinutes / 15) * 15;
-
-      // Obliczamy nową długość (minimalnie 15 minut)
-      const newDuration = Math.max(15, duration + roundedDeltaMinutes);
-
-      // Informujemy rodzica o zmianie rozmiaru
-      onResize(id, newDuration);
-
-      // Resetujemy style i stan
-      appointmentRef.current.style.width = "";
-      setIsResizing(false);
-      setStartResizeX(null);
-      setInitialWidth(null);
-
-      // Usuwamy event listenery
-      window.removeEventListener("mousemove", handleResizeMove);
-      window.removeEventListener("mouseup", handleResizeEnd);
-    }
-  };
-
-  // Formatujemy daty dla tooltipa
   const formatDate = (date?: Date): string => {
     if (!date) return "";
     return date.toLocaleString("pl-PL", {
@@ -133,7 +126,6 @@ export const Appointment: React.FC<IAppointmentProps> = ({
     });
   };
 
-  // Formatujemy dane do wyświetlenia jako tooltip
   const tooltipContent = [
     car,
     description,
@@ -146,20 +138,17 @@ export const Appointment: React.FC<IAppointmentProps> = ({
     .filter(Boolean)
     .join("\n");
 
-  console.log({ startDate, endDate, isMultiDay });
-
-  // Dodatkowe style dla napraw wielodniowych
   const multiDayStyles = isMultiDay
     ? {
         borderLeft: startDate && new Date(startDate).getHours() > 7 ? "4px solid white" : "none",
         borderRight: endDate && new Date(endDate).getHours() < 18 ? "4px solid white" : "none",
         background: `repeating-linear-gradient(
-      45deg,
-      ${color},
-      ${color} 10px,
-      ${color}dd 10px,
-      ${color}dd 20px
-    )`,
+          45deg,
+          ${color},
+          ${color} 10px,
+          ${color}dd 10px,
+          ${color}dd 20px
+        )`,
       }
     : {};
 
@@ -167,27 +156,29 @@ export const Appointment: React.FC<IAppointmentProps> = ({
     <div
       ref={(node) => {
         setNodeRef(node);
-        // @ts-ignore
+        // @ts-ignore - we know this is safe
         appointmentRef.current = node;
       }}
       style={{
         ...style,
-        ...transformStyle,
         ...multiDayStyles,
         position: "absolute",
-        backgroundColor: color || "#3b82f6",
         zIndex: isResizing ? 20 : 10,
-        cursor: isResizing ? "ew-resize" : "move",
+        cursor: isResizing ? "ew-resize" : "pointer",
       }}
-      className="flex h-full items-center justify-between overflow-hidden rounded-md border border-gray-300 p-1 text-sm font-medium text-white shadow-sm"
+      className="flex h-10 items-center justify-between overflow-hidden rounded px-2 text-white"
       title={tooltipContent}
       {...(isResizing ? {} : attributes)}
       {...(isResizing ? {} : listeners)}
+      onClick={handleClick}
     >
-      <span className="truncate">
-        {car}
-        {isMultiDay && <span className="ml-1 text-xs">[wielodniowa]</span>}
-      </span>
+      <div className="flex flex-col overflow-hidden">
+        <div className="truncate text-sm font-medium">{car}</div>
+        <div className="truncate text-xs">
+          {customerName} - {registrationNumber}
+        </div>
+        {description && <div className="truncate text-xs">{description}</div>}
+      </div>
       <div
         className="absolute right-0 top-0 h-full w-2 cursor-ew-resize hover:bg-white hover:bg-opacity-20"
         onMouseDown={handleResizeStart}

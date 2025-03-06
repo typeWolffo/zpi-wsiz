@@ -4,7 +4,6 @@ import { queryClient } from "~/api/queryClient";
 import { mechanicQueryOptions } from "~/api/queries/getMechanics";
 import { useLoaderData } from "react-router";
 import { ordersQueryOptions } from "~/api/queries/getOrders";
-import { AppointmentForm } from "~/components/AppointmentForm/AppointmentForm";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -26,7 +25,6 @@ export default function Home() {
   return (
     <>
       <MechanicScheduler mechanics={mechanics} orders={orders} />
-      <AppointmentForm />
     </>
   );
 }

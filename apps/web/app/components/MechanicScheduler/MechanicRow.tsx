@@ -2,7 +2,12 @@ import { useDroppable } from "@dnd-kit/core";
 import { Appointment } from "./Appointment";
 import type { IMechanicRowProps } from "./types";
 
-export const MechanicRow: React.FC<IMechanicRowProps> = ({ mechanic, appointments, onResize }) => {
+export const MechanicRow: React.FC<IMechanicRowProps> = ({
+  mechanic,
+  appointments,
+  onResize,
+  onAppointmentClick,
+}) => {
   const { setNodeRef, isOver } = useDroppable({
     id: `mechanic-${mechanic.id}`,
     data: { type: "mechanic", mechanicId: mechanic.id },
@@ -26,17 +31,9 @@ export const MechanicRow: React.FC<IMechanicRowProps> = ({ mechanic, appointment
         {appointments.map((appointment) => (
           <Appointment
             key={appointment.id}
-            id={appointment.id}
-            car={appointment.car}
-            start={appointment.start}
-            duration={appointment.duration}
-            color={appointment.color}
-            description={appointment.description}
-            customerName={appointment.customerName}
-            registrationNumber={appointment.registrationNumber}
+            {...appointment}
             onResize={onResize}
-            startDate={appointment.startDate}
-            endDate={appointment.endDate}
+            onClick={onAppointmentClick}
           />
         ))}
       </div>

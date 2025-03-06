@@ -178,7 +178,7 @@ export const AppointmentForm = ({
   defaultValues,
   onClose,
 }: AppointmentFormProps) => {
-  const [open, setOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(!!appointmentId);
   const queryClient = useQueryClient();
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>();
 
@@ -328,17 +328,42 @@ export const AppointmentForm = ({
 
   useEffect(() => {
     if (appointmentId) {
+      setIsOpen(true);
       // Load appointment data if editing
       ApiClient.api
         .repairOrderControllerGetRepairOrderById(appointmentId)
-        .then((response) => {
+        .then(async (response) => {
           const data = response.data.data;
+          if (!data.vehicleId) {
+            throw new Error("No vehicle ID found for appointment");
+          }
+
           const startDate = new Date(data.startDate);
           const endDate = new Date(data.endDate);
+
+          // Get vehicle details
+          const vehicleResponse = await ApiClient.api.vehicleControllerGetVehicleById(
+            data.vehicleId,
+          );
+          const vehicle = vehicleResponse.data.data;
+
+          if (!vehicle.customerId) {
+            throw new Error("No customer ID found for vehicle");
+          }
+
+          // Get customer details
+          const customerResponse = await ApiClient.api.customerControllerGetCustomerById(
+            vehicle.customerId,
+          );
+          const customer = customerResponse.data.data;
+
+          setSelectedCustomerId(customer.id);
 
           form.reset({
             description: data.description,
             customerType: "existing",
+            customerId: customer.id,
+            vehicleId: vehicle.id,
             startDate,
             startTime: format(startDate, "HH:mm"),
             endDate,
@@ -349,6 +374,7 @@ export const AppointmentForm = ({
         .catch((error) => {
           toast.error("Failed to load appointment data");
           console.error(error);
+          handleClose();
         });
     }
   }, [appointmentId, form]);
@@ -395,16 +421,18 @@ export const AppointmentForm = ({
   };
 
   const handleClose = () => {
-    setOpen(false);
+    setIsOpen(false);
     form.reset();
     onClose?.();
   };
 
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>
-        <Button variant="outline">{appointmentId ? "Edit Appointment" : "New Appointment"}</Button>
-      </SheetTrigger>
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+      {!appointmentId ? (
+        <SheetTrigger asChild>
+          <Button variant="outline">New Appointment</Button>
+        </SheetTrigger>
+      ) : null}
       <SheetContent className="w-[640px]">
         <SheetHeader>
           <SheetTitle>{appointmentId ? "Edit Appointment" : "New Appointment"}</SheetTitle>

@@ -25,11 +25,13 @@ import {
   getAppointmentsForDate,
 } from "./helpers";
 import type { IAppointment, MechanicSchedulerProps } from "./types";
+import { AppointmentForm } from "../AppointmentForm/AppointmentForm";
 
 const MechanicScheduler: React.FC<MechanicSchedulerProps> = ({ mechanics, orders }) => {
   const { mutateAsync: updateRepairOrder } = useUpdateRepairOrder();
 
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(null);
 
   const timeSlots = generateTimeSlots();
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -170,12 +172,27 @@ const MechanicScheduler: React.FC<MechanicSchedulerProps> = ({ mechanics, orders
     });
   };
 
+  const handleAppointmentClick = (appointmentId: string) => {
+    setSelectedAppointmentId(appointmentId);
+  };
+
+  const handleAppointmentClose = () => {
+    setSelectedAppointmentId(null);
+  };
+
   return (
     <div className="mx-auto w-full max-w-6xl overflow-x-auto">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-xl font-bold text-gray-800">Harmonogram mechaników</h2>
 
         <div className="flex items-center gap-4">
+          <AppointmentForm
+            defaultValues={{
+              startDate: selectedDate,
+              endDate: selectedDate,
+            }}
+            onClose={handleAppointmentClose}
+          />
           <div className="relative">
             <Calendar
               mode="single"
@@ -187,6 +204,11 @@ const MechanicScheduler: React.FC<MechanicSchedulerProps> = ({ mechanics, orders
           </div>
         </div>
       </div>
+
+      {/* Appointment edit form */}
+      {selectedAppointmentId && (
+        <AppointmentForm appointmentId={selectedAppointmentId} onClose={handleAppointmentClose} />
+      )}
 
       <div className="mb-4 flex flex-col">
         <h3 className="text-lg font-medium">{formatDate(selectedDate)}</h3>
@@ -237,6 +259,7 @@ const MechanicScheduler: React.FC<MechanicSchedulerProps> = ({ mechanics, orders
               mechanic={mechanic}
               appointments={appointments.filter((a) => a.mechanicId === mechanic.id)}
               onResize={handleResize}
+              onAppointmentClick={handleAppointmentClick}
             />
           ))}
 
@@ -249,9 +272,8 @@ const MechanicScheduler: React.FC<MechanicSchedulerProps> = ({ mechanics, orders
                     activeAppointment.start,
                     activeAppointment.duration,
                   ).width,
-                  height: "100%",
                 }}
-                className="h-10 overflow-hidden rounded-md border border-gray-300 p-1 text-sm font-medium text-white shadow-sm"
+                className="h-10 rounded px-2 text-white"
               >
                 {activeAppointment.car}
               </div>
