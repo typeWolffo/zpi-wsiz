@@ -2,39 +2,33 @@ import {
   Body,
   Controller,
   Delete,
-  ForbiddenException,
   Get,
   Param,
   Patch,
   Post,
-  Query,
   UseGuards,
 } from '@nestjs/common';
 import { Type } from '@sinclair/typebox';
 import { Validate } from 'nestjs-typebox';
 
-import {
-  baseResponse,
-  BaseResponse,
-  nullResponse,
-  PaginatedResponse,
-  paginatedResponse,
-  UUIDSchema,
-  type UUIDType,
-} from 'src/common';
-import { Roles } from 'src/common/decorators/roles.decorator';
-import { CurrentUser } from 'src/common/decorators/user.decorator';
-import { RolesGuard } from 'src/common/guards/roles.guard';
-import type { Static } from '@sinclair/typebox';
-import { USER_ROLES } from 'src/user/schemas/userRoles';
-import { MechanicService } from './mechanic.service';
+import { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 import {
   createInsertSchema,
   createSelectSchema,
   createUpdateSchema,
 } from 'drizzle-typebox';
+import {
+  baseResponse,
+  BaseResponse,
+  nullResponse,
+  UUIDSchema,
+  type UUIDType,
+} from 'src/common';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { RolesGuard } from 'src/common/guards/roles.guard';
 import { mechanics, users } from 'src/storage/schema';
-import { InferInsertModel, InferSelectModel } from 'drizzle-orm';
+import { USER_ROLES } from 'src/user/schemas/userRoles';
+import { MechanicService } from './mechanic.service';
 
 const userSelectSchema = createSelectSchema(users);
 const mechanicSelectSchema = createSelectSchema(mechanics);

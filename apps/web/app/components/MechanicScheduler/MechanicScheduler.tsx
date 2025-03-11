@@ -11,11 +11,14 @@ import {
 } from "@dnd-kit/core";
 import { restrictToWindowEdges } from "@dnd-kit/modifiers";
 import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
+import { ChevronDown } from "lucide-react";
 import React, { useEffect, useMemo, useState } from "react";
 import { useUpdateRepairOrder } from "~/api/mutations/useUpdateOrder";
 import { ordersQueryOptions } from "~/api/queries/getOrders";
 import { queryClient } from "~/api/queryClient";
+import { AppointmentForm } from "../AppointmentForm/AppointmentForm";
 import { Calendar } from "../ui/calendar";
+import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { MechanicRow } from "./MechanicRow";
 import {
   calculateAppointmentStyle,
@@ -25,7 +28,6 @@ import {
   getAppointmentsForDate,
 } from "./helpers";
 import type { IAppointment, MechanicSchedulerProps } from "./types";
-import { AppointmentForm } from "../AppointmentForm/AppointmentForm";
 
 const MechanicScheduler: React.FC<MechanicSchedulerProps> = ({ mechanics, orders }) => {
   const { mutateAsync: updateRepairOrder } = useUpdateRepairOrder();
@@ -141,8 +143,6 @@ const MechanicScheduler: React.FC<MechanicSchedulerProps> = ({ mechanics, orders
       String(newEndDate.getMinutes()).padStart(2, "0") +
       ":00";
 
-    console.log("Nowa sformatowana data do API:", formattedEndDate);
-
     setAppointments((prev) =>
       prev.map((app) =>
         app.id === id
@@ -181,10 +181,9 @@ const MechanicScheduler: React.FC<MechanicSchedulerProps> = ({ mechanics, orders
   };
 
   return (
-    <div className="mx-auto w-full max-w-6xl overflow-x-auto">
+    <div className="mx-auto w-full max-w-6xl overflow-x-auto p-6">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-xl font-bold text-gray-800">Harmonogram mechaników</h2>
-
         <div className="flex items-center gap-4">
           <AppointmentForm
             defaultValues={{
@@ -193,7 +192,23 @@ const MechanicScheduler: React.FC<MechanicSchedulerProps> = ({ mechanics, orders
             }}
             onClose={handleAppointmentClose}
           />
-          <div className="relative">
+        </div>
+      </div>
+
+      {selectedAppointmentId && (
+        <AppointmentForm appointmentId={selectedAppointmentId} onClose={handleAppointmentClose} />
+      )}
+
+      <div className="mb-4 flex flex-col items-start">
+        <Popover>
+          <PopoverAnchor className="w-1/3"></PopoverAnchor>
+          <PopoverTrigger>
+            <h3 className="flex items-center gap-2 text-lg font-medium">
+              {formatDate(selectedDate)}
+              <ChevronDown />
+            </h3>
+          </PopoverTrigger>
+          <PopoverContent>
             <Calendar
               mode="single"
               selected={selectedDate}
@@ -201,17 +216,8 @@ const MechanicScheduler: React.FC<MechanicSchedulerProps> = ({ mechanics, orders
               className="rounded-md border"
               required
             />
-          </div>
-        </div>
-      </div>
-
-      {/* Appointment edit form */}
-      {selectedAppointmentId && (
-        <AppointmentForm appointmentId={selectedAppointmentId} onClose={handleAppointmentClose} />
-      )}
-
-      <div className="mb-4 flex flex-col">
-        <h3 className="text-lg font-medium">{formatDate(selectedDate)}</h3>
+          </PopoverContent>
+        </Popover>
         <div className="flex gap-4 text-sm text-gray-600">
           <span>Liczba napraw: {appointmentsForSelectedDay.length}</span>
         </div>

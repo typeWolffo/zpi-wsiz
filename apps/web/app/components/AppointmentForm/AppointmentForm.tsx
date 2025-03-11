@@ -37,8 +37,8 @@ import {
 } from "~/components/ui/form";
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 
-const timeOptions = Array.from({ length: 24 * 4 }, (_, i) => {
-  const hour = Math.floor(i / 4);
+const timeOptions = Array.from({ length: (18 - 7) * 4 + 1 }, (_, i) => {
+  const hour = Math.floor(i / 4) + 7; // Start from 7:00
   const minute = (i % 4) * 15;
   return {
     value: `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`,
@@ -182,6 +182,40 @@ export const AppointmentForm = ({
   const queryClient = useQueryClient();
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>();
 
+  const { data: appointmentData, isLoading: isLoadingAppointment } = useQuery({
+    queryKey: ["appointment", appointmentId],
+    queryFn: async () => {
+      if (!appointmentId) return null;
+      const response = await ApiClient.api.repairOrderControllerGetRepairOrderById(appointmentId);
+      return response.data.data;
+    },
+    enabled: !!appointmentId,
+  });
+
+  const { data: vehicleData, isLoading: isLoadingVehicle } = useQuery({
+    queryKey: ["vehicle", appointmentData?.vehicleId],
+    queryFn: async () => {
+      if (!appointmentData?.vehicleId) return null;
+      const response = await ApiClient.api.vehicleControllerGetVehicleById(
+        appointmentData.vehicleId,
+      );
+      return response.data.data;
+    },
+    enabled: !!appointmentData?.vehicleId,
+  });
+
+  const { data: customerData, isLoading: isLoadingCustomer } = useQuery({
+    queryKey: ["customer", vehicleData?.customerId],
+    queryFn: async () => {
+      if (!vehicleData?.customerId) return null;
+      const response = await ApiClient.api.customerControllerGetCustomerById(
+        vehicleData.customerId,
+      );
+      return response.data.data;
+    },
+    enabled: !!vehicleData?.customerId,
+  });
+
   const form = useForm<AppointmentFormValues>({
     resolver: zodResolver(appointmentFormSchema),
     defaultValues: defaultValues || {
@@ -206,7 +240,6 @@ export const AppointmentForm = ({
   const customerType = form.watch("customerType");
   const customerId = form.watch("customerId");
 
-  // Fetch mechanics for the dropdown
   const { data: mechanics } = useQuery({
     queryKey: ["mechanics"],
     queryFn: async () => {
@@ -215,7 +248,6 @@ export const AppointmentForm = ({
     },
   });
 
-  // Fetch customers for the dropdown
   const { data: customers } = useQuery({
     queryKey: ["customers"],
     queryFn: async () => {
@@ -224,7 +256,6 @@ export const AppointmentForm = ({
     },
   });
 
-  // Fetch vehicles for the selected customer
   const { data: vehicles } = useQuery({
     queryKey: ["vehicles", selectedCustomerId],
     queryFn: async () => {
@@ -327,59 +358,26 @@ export const AppointmentForm = ({
   });
 
   useEffect(() => {
-    if (appointmentId) {
-      setIsOpen(true);
-      // Load appointment data if editing
-      ApiClient.api
-        .repairOrderControllerGetRepairOrderById(appointmentId)
-        .then(async (response) => {
-          const data = response.data.data;
-          if (!data.vehicleId) {
-            throw new Error("No vehicle ID found for appointment");
-          }
+    if (appointmentId && appointmentData && vehicleData && customerData) {
+      const startDate = new Date(appointmentData.startDate);
+      const endDate = new Date(appointmentData.endDate);
 
-          const startDate = new Date(data.startDate);
-          const endDate = new Date(data.endDate);
+      setSelectedCustomerId(customerData.id);
 
-          // Get vehicle details
-          const vehicleResponse = await ApiClient.api.vehicleControllerGetVehicleById(
-            data.vehicleId,
-          );
-          const vehicle = vehicleResponse.data.data;
-
-          if (!vehicle.customerId) {
-            throw new Error("No customer ID found for vehicle");
-          }
-
-          // Get customer details
-          const customerResponse = await ApiClient.api.customerControllerGetCustomerById(
-            vehicle.customerId,
-          );
-          const customer = customerResponse.data.data;
-
-          setSelectedCustomerId(customer.id);
-
-          form.reset({
-            description: data.description,
-            customerType: "existing",
-            customerId: customer.id,
-            vehicleId: vehicle.id,
-            startDate,
-            startTime: format(startDate, "HH:mm"),
-            endDate,
-            endTime: format(endDate, "HH:mm"),
-            mechanicId: data.assignedMechanicId || undefined,
-          });
-        })
-        .catch((error) => {
-          toast.error("Failed to load appointment data");
-          console.error(error);
-          handleClose();
-        });
+      form.reset({
+        description: appointmentData.description,
+        customerType: "existing",
+        customerId: customerData.id,
+        vehicleId: vehicleData.id,
+        startDate,
+        startTime: format(startDate, "HH:mm"),
+        endDate,
+        endTime: format(endDate, "HH:mm"),
+        mechanicId: appointmentData.assignedMechanicId || undefined,
+      });
     }
-  }, [appointmentId, form]);
+  }, [appointmentId, appointmentData, vehicleData, customerData, form]);
 
-  // Update vehicles when customer changes
   useEffect(() => {
     if (customerId) {
       setSelectedCustomerId(customerId);
@@ -394,11 +392,9 @@ export const AppointmentForm = ({
         let finalVehicleId: string;
 
         if (data.customerType === "new") {
-          // 1. Create customer
           const customerResponse = await createCustomer(data);
           if (!customerResponse) throw new Error("Failed to create customer");
 
-          // 2. Create vehicle
           const vehicleResponse = await createVehicle({
             data,
             customerId: customerResponse.data.id,
@@ -411,7 +407,6 @@ export const AppointmentForm = ({
           finalVehicleId = data.vehicleId;
         }
 
-        // 3. Create repair order
         await createRepairOrder({ data, vehicleId: finalVehicleId });
       }
     } catch (error) {
@@ -425,6 +420,8 @@ export const AppointmentForm = ({
     form.reset();
     onClose?.();
   };
+
+  const isLoading = isLoadingAppointment || isLoadingVehicle || isLoadingCustomer;
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -442,371 +439,377 @@ export const AppointmentForm = ({
               : "Fill in the appointment details below"}
           </SheetDescription>
         </SheetHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Textarea {...field} placeholder="Enter repair description" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="mechanicId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Assign Mechanic</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+        {isLoading ? (
+          <div className="flex h-[200px] items-center justify-center">
+            <div className="text-sm text-gray-500">Loading appointment data...</div>
+          </div>
+        ) : (
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
                     <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a mechanic" />
-                      </SelectTrigger>
+                      <Textarea {...field} placeholder="Enter repair description" />
                     </FormControl>
-                    <SelectContent>
-                      {mechanics?.map((mechanic) => (
-                        <SelectItem key={mechanic.id} value={mechanic.id}>
-                          {mechanic.firstName} {mechanic.lastName}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name="customerType"
-              render={({ field }) => (
-                <FormItem className="space-y-3">
-                  <FormLabel>Customer</FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      className="flex flex-col space-y-1"
-                    >
-                      <FormItem className="flex items-center space-x-3 space-y-0">
-                        <FormControl>
-                          <RadioGroupItem value="existing" />
-                        </FormControl>
-                        <FormLabel className="font-normal">Select Existing Customer</FormLabel>
-                      </FormItem>
-                      <FormItem className="flex items-center space-x-3 space-y-0">
-                        <FormControl>
-                          <RadioGroupItem value="new" />
-                        </FormControl>
-                        <FormLabel className="font-normal">Create New Customer</FormLabel>
-                      </FormItem>
-                    </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {customerType === "existing" ? (
-              <>
-                <FormField
-                  control={form.control}
-                  name="customerId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Select Customer</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a customer" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {customers?.map((customer) => (
-                            <SelectItem key={customer.id} value={customer.id}>
-                              {customer.firstName} {customer.lastName} ({customer.email})
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="vehicleId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Select Vehicle</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a vehicle" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {vehicles?.map((vehicle) => (
-                            <SelectItem key={vehicle.id} value={vehicle.id}>
-                              {vehicle.make} {vehicle.model} ({vehicle.year}) -{" "}
-                              {vehicle.registrationNumber}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </>
-            ) : (
-              <>
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="customerFirstName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>First Name</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Customer first name" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="customerLastName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Last Name</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Customer last name" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="customerEmail"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input {...field} type="email" placeholder="Customer email" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="customerPhoneNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone Number</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Customer phone number" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="make"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Make</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Vehicle make" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="model"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Model</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Vehicle model" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="year"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Year</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Vehicle year" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="vin"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>VIN</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Vehicle VIN" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <FormField
-                  control={form.control}
-                  name="registrationNumber"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Registration Number</FormLabel>
+              <FormField
+                control={form.control}
+                name="mechanicId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Assign Mechanic</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <Input {...field} placeholder="Vehicle registration number" />
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a mechanic" />
+                        </SelectTrigger>
                       </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </>
-            )}
+                      <SelectContent>
+                        {mechanics?.map((mechanic) => (
+                          <SelectItem key={mechanic.id} value={mechanic.id}>
+                            {mechanic.firstName} {mechanic.lastName}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="startDate"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>Start Date</FormLabel>
-                      <FormControl>
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          initialFocus
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="startTime"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Start Time</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <FormField
+                control={form.control}
+                name="customerType"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel>Customer</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="flex flex-col space-y-1"
+                      >
+                        <FormItem className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="existing" />
+                          </FormControl>
+                          <FormLabel className="font-normal">Select Existing Customer</FormLabel>
+                        </FormItem>
+                        <FormItem className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="new" />
+                          </FormControl>
+                          <FormLabel className="font-normal">Create New Customer</FormLabel>
+                        </FormItem>
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {customerType === "existing" ? (
+                <>
+                  <FormField
+                    control={form.control}
+                    name="customerId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Select Customer</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a customer" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {customers?.map((customer) => (
+                              <SelectItem key={customer.id} value={customer.id}>
+                                {customer.firstName} {customer.lastName} ({customer.email})
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="vehicleId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Select Vehicle</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a vehicle" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {vehicles?.map((vehicle) => (
+                              <SelectItem key={vehicle.id} value={vehicle.id}>
+                                {vehicle.make} {vehicle.model} ({vehicle.year}) -{" "}
+                                {vehicle.registrationNumber}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </>
+              ) : (
+                <>
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="customerFirstName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>First Name</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="Customer first name" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="customerLastName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Last Name</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="Customer last name" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="customerEmail"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email</FormLabel>
+                          <FormControl>
+                            <Input {...field} type="email" placeholder="Customer email" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="customerPhoneNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Phone Number</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="Customer phone number" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="make"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Make</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="Vehicle make" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="model"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Model</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="Vehicle model" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="year"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Year</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="Vehicle year" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="vin"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>VIN</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="Vehicle VIN" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="registrationNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Registration Number</FormLabel>
                         <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select time" />
-                          </SelectTrigger>
+                          <Input {...field} placeholder="Vehicle registration number" />
                         </FormControl>
-                        <SelectContent>
-                          {timeOptions.map((option) => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {option.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </>
+              )}
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="startDate"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel>Start Date</FormLabel>
+                        <FormControl>
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            initialFocus
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="startTime"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Start Time</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select time" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {timeOptions.map((option) => (
+                              <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="endDate"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel>End Date</FormLabel>
+                        <FormControl>
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            initialFocus
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="endTime"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>End Time</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select time" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {timeOptions.map((option) => (
+                              <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </div>
 
-              <div className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="endDate"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>End Date</FormLabel>
-                      <FormControl>
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          initialFocus
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="endTime"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>End Time</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select time" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {timeOptions.map((option) => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {option.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <div className="flex justify-end space-x-2 pt-4">
+                <Button type="button" variant="outline" onClick={handleClose}>
+                  Cancel
+                </Button>
+                <Button type="submit">
+                  {appointmentId ? "Update Appointment" : "Create Appointment"}
+                </Button>
               </div>
-            </div>
-
-            <div className="flex justify-end space-x-2 pt-4">
-              <Button type="button" variant="outline" onClick={handleClose}>
-                Cancel
-              </Button>
-              <Button type="submit">
-                {appointmentId ? "Update Appointment" : "Create Appointment"}
-              </Button>
-            </div>
-          </form>
-        </Form>
+            </form>
+          </Form>
+        )}
       </SheetContent>
     </Sheet>
   );

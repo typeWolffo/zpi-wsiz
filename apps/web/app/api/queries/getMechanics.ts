@@ -8,13 +8,33 @@ export const mechanicQueryOptions = {
     const response = await ApiClient.api.mechanicControllerGetMechanics();
     return response.data;
   },
-  select: (data: GetMechanicsResponse) => data.data,
 };
 
-export function useMechanic() {
-  return useQuery(mechanicQueryOptions);
+export const mechanicByIdQueryOptions = (id: string) => ({
+  queryKey: ["mechanics", id],
+  queryFn: async () => {
+    const response = await ApiClient.api.mechanicControllerGetMechanicById(id);
+    return response.data;
+  },
+});
+
+export function useMechanics() {
+  return useQuery({
+    ...mechanicQueryOptions,
+    select: (data: GetMechanicsResponse) => data.data,
+  });
 }
 
-export function useMechanicSuspense() {
-  return useSuspenseQuery(mechanicQueryOptions);
+export function useMechanicById(id: string) {
+  return useQuery({
+    ...mechanicByIdQueryOptions(id),
+    enabled: !!id,
+  });
+}
+
+export function useMechanicsSuspense() {
+  return useSuspenseQuery({
+    ...mechanicQueryOptions,
+    select: (data: GetMechanicsResponse) => data.data,
+  });
 }

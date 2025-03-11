@@ -21,7 +21,6 @@ export const clientLoader = async () => {
 export default function Home() {
   const { mechanics, orders } = useLoaderData<typeof clientLoader>();
 
-  console.log({ mechanics, orders });
   return (
     <>
       <MechanicScheduler mechanics={mechanics} orders={orders} />

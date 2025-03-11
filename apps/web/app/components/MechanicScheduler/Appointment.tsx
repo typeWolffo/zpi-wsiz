@@ -177,7 +177,6 @@ export const Appointment: React.FC<IAppointmentProps> = ({
         <div className="truncate text-xs">
           {customerName} - {registrationNumber}
         </div>
-        {description && <div className="truncate text-xs">{description}</div>}
       </div>
       <div
         className="absolute right-0 top-0 h-full w-2 cursor-ew-resize hover:bg-white hover:bg-opacity-20"

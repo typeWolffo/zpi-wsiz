@@ -26,6 +26,9 @@ export function AppSidebar() {
           <NavLink to="/mechanics" className={navLinkStyles} end>
             Mechanics
           </NavLink>
+          <NavLink to="/vehicles" className={navLinkStyles} end>
+            Vehicles
+          </NavLink>
         </nav>
         <SidebarGroup />
         <NavLink to="/settings" className={navLinkStyles} end>

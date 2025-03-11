@@ -14,6 +14,8 @@ export interface IMechanic {
   id: string;
   firstName: string;
   lastName: string;
+  shiftStart: ITimeStart;
+  shiftEnd: ITimeStart;
 }
 
 export interface IAppointment {
@@ -54,10 +56,6 @@ export interface IAppointmentProps {
 }
 
 export interface MechanicSchedulerProps {
-  mechanics: Array<{
-    id: string;
-    firstName: string;
-    lastName: string;
-  }>;
-  orders: Array<any>;
+  mechanics: Array<MechanicAPI>;
+  orders: Array<RepairOrderAPI>;
 }
