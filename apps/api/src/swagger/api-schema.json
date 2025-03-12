@@ -2751,6 +2751,39 @@
                       "type": "null"
                     }
                   ]
+                },
+                "startDate": {
+                  "type": "string"
+                },
+                "endDate": {
+                  "type": "string"
+                },
+                "make": {
+                  "type": "string"
+                },
+                "model": {
+                  "type": "string"
+                },
+                "year": {
+                  "type": "string"
+                },
+                "vin": {
+                  "type": "string"
+                },
+                "registrationNumber": {
+                  "type": "string"
+                },
+                "customerFirstName": {
+                  "type": "string"
+                },
+                "customerLastName": {
+                  "type": "string"
+                },
+                "customerEmail": {
+                  "type": "string"
+                },
+                "customerPhoneNumber": {
+                  "type": "string"
                 }
               },
               "required": [
@@ -2760,7 +2793,18 @@
                 "updatedAt",
                 "description",
                 "assignedMechanicId",
-                "vehicleId"
+                "vehicleId",
+                "startDate",
+                "endDate",
+                "make",
+                "model",
+                "year",
+                "vin",
+                "registrationNumber",
+                "customerFirstName",
+                "customerLastName",
+                "customerEmail",
+                "customerPhoneNumber"
               ]
             }
           }
@@ -2819,6 +2863,39 @@
                     "type": "null"
                   }
                 ]
+              },
+              "startDate": {
+                "type": "string"
+              },
+              "endDate": {
+                "type": "string"
+              },
+              "make": {
+                "type": "string"
+              },
+              "model": {
+                "type": "string"
+              },
+              "year": {
+                "type": "string"
+              },
+              "vin": {
+                "type": "string"
+              },
+              "registrationNumber": {
+                "type": "string"
+              },
+              "customerFirstName": {
+                "type": "string"
+              },
+              "customerLastName": {
+                "type": "string"
+              },
+              "customerEmail": {
+                "type": "string"
+              },
+              "customerPhoneNumber": {
+                "type": "string"
               }
             },
             "required": [
@@ -2828,7 +2905,18 @@
               "updatedAt",
               "description",
               "assignedMechanicId",
-              "vehicleId"
+              "vehicleId",
+              "startDate",
+              "endDate",
+              "make",
+              "model",
+              "year",
+              "vin",
+              "registrationNumber",
+              "customerFirstName",
+              "customerLastName",
+              "customerEmail",
+              "customerPhoneNumber"
             ]
           }
         },
@@ -2883,6 +2971,12 @@
                 "type": "null"
               }
             ]
+          },
+          "startDate": {
+            "type": "string"
+          },
+          "endDate": {
+            "type": "string"
           }
         }
       },
@@ -2936,17 +3030,14 @@
                     "type": "null"
                   }
                 ]
+              },
+              "startDate": {
+                "type": "string"
+              },
+              "endDate": {
+                "type": "string"
               }
-            },
-            "required": [
-              "id",
-              "createdAt",
-              "archivedAt",
-              "updatedAt",
-              "description",
-              "assignedMechanicId",
-              "vehicleId"
-            ]
+            }
           }
         },
         "required": [
@@ -3003,10 +3094,18 @@
                 "type": "null"
               }
             ]
+          },
+          "startDate": {
+            "type": "string"
+          },
+          "endDate": {
+            "type": "string"
           }
         },
         "required": [
-          "description"
+          "description",
+          "startDate",
+          "endDate"
         ]
       },
       "CreateRepairOrderResponse": {

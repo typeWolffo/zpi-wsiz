@@ -8,7 +8,7 @@ services:
     volumes:
       - zpi-db-data:/var/lib/postgresql/data
     ports:
-      - 5432:5432
+      - 5433:5432
   # redis:
   #   image: redis:8.0-M02-alpine3.20
   #   restart: always
@@ -19,8 +19,8 @@ services:
   mailhog:
     image: mailhog/mailhog
     ports:
-      - 1025:1025
-      - 8025:8025
+      - 1026:1025
+      - 8026:8025
 
 volumes:
   zpi-db-data:

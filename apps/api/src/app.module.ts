@@ -39,6 +39,7 @@ import { CustomerModule } from './customer/customer.module';
     DrizzlePostgresModule.registerAsync({
       tag: 'DB',
       useFactory(configService: ConfigService) {
+        console.log(configService.get<string>('database.url')!);
         return {
           postgres: {
             url: configService.get<string>('database.url')!,

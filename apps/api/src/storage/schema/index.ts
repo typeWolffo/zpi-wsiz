@@ -1,4 +1,11 @@
-import { pgTable, text, timestamp, uuid, time } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+  time,
+  date,
+} from 'drizzle-orm/pg-core';
 import { id, timestamps } from './utils';
 
 export const users = pgTable('users', {
@@ -102,4 +109,6 @@ export const repairOrders = pgTable('repair_orders', {
   vehicleId: uuid('vehicle_id').references(() => vehicles.id, {
     onDelete: 'set null',
   }),
+  startDate: text('start_time').notNull(),
+  endDate: text('end_time').notNull(),
 });
