@@ -1,9 +1,7 @@
 import type { GetMechanicsResponse, GetRepairOrdersResponse } from "~/api/generated-api";
 
-
 export type MechanicAPI = GetMechanicsResponse["data"][number];
 export type RepairOrderAPI = GetRepairOrdersResponse["data"][number];
-
 
 export interface ITimeStart {
   hour: number;
@@ -37,6 +35,7 @@ export interface IMechanicRowProps {
   appointments: IAppointment[];
   onResize: (id: string, newDuration: number) => void;
   onAppointmentClick: (id: string) => void;
+  isEmployee: boolean;
 }
 
 export interface IAppointmentProps {
@@ -53,6 +52,7 @@ export interface IAppointmentProps {
   endDate?: Date;
   onResize: (id: string, newDuration: number) => void;
   onClick: (id: string) => void;
+  isEmployee: boolean;
 }
 
 export interface MechanicSchedulerProps {

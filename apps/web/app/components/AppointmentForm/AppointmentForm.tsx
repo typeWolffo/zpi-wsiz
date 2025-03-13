@@ -18,7 +18,7 @@ import { CustomerSection } from "./components/CustomerSection";
 import { DateTimeSection } from "./components/DateTimeSection";
 import { useAppointmentData } from "./hooks/useAppointmentData";
 import { useAppointmentMutations } from "./hooks/useAppointmentMutations";
-import { useCustomerVehicleData } from "./hooks/useCustomerVehicleData";
+import { useCurrentUserStore } from "~/store/useCurrentUserStore";
 
 export const AppointmentForm = ({
   appointmentId,
@@ -26,6 +26,8 @@ export const AppointmentForm = ({
   onClose,
 }: AppointmentFormProps) => {
   const [isOpen, setIsOpen] = useState(!!appointmentId);
+  const currentUser = useCurrentUserStore((state) => state.currentUser);
+  const isEmployee = currentUser?.role === "employee" || false;
 
   const form = useForm<AppointmentFormValues>({
     resolver: zodResolver(appointmentFormSchema),
@@ -139,19 +141,21 @@ export const AppointmentForm = ({
         ) : (
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
-              <BasicDetailsSection form={form} mechanics={mechanics} />
+              <BasicDetailsSection form={form} mechanics={mechanics} isEmployee={isEmployee} />
 
-              <CustomerSection form={form} />
+              <CustomerSection form={form} isEmployee={isEmployee} />
 
-              <DateTimeSection form={form} />
+              <DateTimeSection form={form} isEmployee={isEmployee} />
 
               <div className="flex justify-end space-x-2 pt-4">
                 <Button type="button" variant="outline" onClick={handleClose}>
                   Cancel
                 </Button>
-                <Button type="submit">
-                  {appointmentId ? "Update Appointment" : "Create Appointment"}
-                </Button>
+                {!isEmployee && (
+                  <Button type="submit">
+                    {appointmentId ? "Update Appointment" : "Create Appointment"}
+                  </Button>
+                )}
               </div>
             </form>
           </Form>

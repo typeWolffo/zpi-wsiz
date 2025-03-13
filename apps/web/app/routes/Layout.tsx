@@ -1,7 +1,10 @@
-import { Outlet } from "react-router";
+import { Outlet, useLocation, useNavigate } from "react-router";
 import { AppSidebar } from "~/components/AppSidebar/AppSidebar";
 import { SidebarProvider, SidebarTrigger } from "~/components/ui/sidebar";
-import React, { Suspense } from "react";
+import React, { Suspense, useEffect } from "react";
+import { useAuthStore } from "~/store/authStore";
+import { requestManager } from "~/api/api-client";
+import { useCurrentUserStore } from "~/store/useCurrentUserStore";
 
 class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean }> {
   constructor(props: { children: React.ReactNode }) {
@@ -42,6 +45,31 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
 }
 
 export default function Layout() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+  const currentUser = useCurrentUserStore((state) => state.currentUser);
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      requestManager.abortAll();
+      navigate("/login");
+      return;
+    }
+
+    if (currentUser?.role === "employee") {
+      const currentPath = location.pathname;
+
+      if (currentPath !== "/" && currentPath !== "/home") {
+        navigate("/");
+      }
+    }
+  }, [isLoggedIn, currentUser, navigate, location.pathname]);
+
+  if (!isLoggedIn) {
+    return <div className="flex justify-center p-8">Redirecting to login...</div>;
+  }
+
   return (
     <SidebarProvider>
       <AppSidebar />

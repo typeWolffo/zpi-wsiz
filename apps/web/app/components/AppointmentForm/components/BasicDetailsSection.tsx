@@ -13,9 +13,14 @@ import type { AppointmentFormValues } from "../schema";
 interface BasicDetailsSectionProps {
   form: UseFormReturn<AppointmentFormValues>;
   mechanics?: Array<{ id: string; firstName: string; lastName: string }>;
+  isEmployee: boolean;
 }
 
-export function BasicDetailsSection({ form, mechanics = [] }: BasicDetailsSectionProps) {
+export function BasicDetailsSection({
+  form,
+  mechanics = [],
+  isEmployee,
+}: BasicDetailsSectionProps) {
   return (
     <>
       <FormField
@@ -25,7 +30,7 @@ export function BasicDetailsSection({ form, mechanics = [] }: BasicDetailsSectio
           <FormItem>
             <FormLabel>Description</FormLabel>
             <FormControl>
-              <Textarea {...field} placeholder="Enter repair description" />
+              <Textarea {...field} placeholder="Enter repair description" disabled={isEmployee} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -40,7 +45,7 @@ export function BasicDetailsSection({ form, mechanics = [] }: BasicDetailsSectio
             <FormLabel>Assign Mechanic</FormLabel>
             <Select onValueChange={field.onChange} defaultValue={field.value}>
               <FormControl>
-                <SelectTrigger>
+                <SelectTrigger disabled={isEmployee}>
                   <SelectValue placeholder="Select a mechanic" />
                 </SelectTrigger>
               </FormControl>

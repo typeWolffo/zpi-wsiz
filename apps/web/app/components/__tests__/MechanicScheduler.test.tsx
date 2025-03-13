@@ -4,7 +4,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { GetMechanicsResponse, GetRepairOrdersResponse } from "~/api/generated-api";
 import type { ReactNode } from "react";
 
-
 vi.mock("@dnd-kit/core", () => ({
   DndContext: ({
     children,
@@ -52,13 +51,11 @@ vi.mock("@dnd-kit/core", () => ({
   KeyboardCode: { Space: "Space", ArrowRight: "ArrowRight" },
 }));
 
-
 vi.mock("@dnd-kit/modifiers", () => ({
   restrictToWindowEdges: vi.fn(),
   restrictToVerticalAxis: vi.fn(),
   restrictToHorizontalAxis: vi.fn(),
 }));
-
 
 vi.mock("@dnd-kit/sortable", () => ({
   sortableKeyboardCoordinates: vi.fn(),
@@ -73,7 +70,6 @@ vi.mock("@dnd-kit/sortable", () => ({
     transition: null,
   }),
 }));
-
 
 vi.mock("../MechanicScheduler/MechanicRow", () => ({
   MechanicRow: ({ mechanic, appointments, onResize, onAppointmentClick }: any) => (
@@ -90,7 +86,6 @@ vi.mock("../MechanicScheduler/MechanicRow", () => ({
   ),
 }));
 
-
 vi.mock("../MechanicScheduler/Appointment", () => ({
   Appointment: ({ id, car, customerName, onClick }: any) => (
     <div data-testid={`appointment-${id}`} onClick={() => onClick(id)}>
@@ -99,9 +94,7 @@ vi.mock("../MechanicScheduler/Appointment", () => ({
   ),
 }));
 
-
 import MechanicScheduler from "../MechanicScheduler/MechanicScheduler";
-
 
 vi.mock("../ui/calendar", () => ({
   Calendar: ({
@@ -128,14 +121,12 @@ vi.mock("../ui/calendar", () => ({
   },
 }));
 
-
 vi.mock("~/api/mutations/useUpdateOrder", () => ({
   useUpdateRepairOrder: () => ({
     mutateAsync: vi.fn().mockResolvedValue({ id: "1" }),
     isPending: false,
   }),
 }));
-
 
 vi.mock("~/api/queryClient", () => {
   const mockQueryClient = new QueryClient({
@@ -150,7 +141,6 @@ vi.mock("~/api/queryClient", () => {
   };
 });
 
-
 vi.mock("~/api/api-client", () => ({
   requestManager: {
     getToken: vi.fn(),
@@ -162,7 +152,6 @@ vi.mock("~/api/api-client", () => ({
   },
 }));
 
-
 vi.mock("~/components/ui/popover", () => ({
   Popover: ({ children }: { children: ReactNode }) => <div data-testid="popover">{children}</div>,
   PopoverAnchor: ({ children }: { children: ReactNode }) => <div>{children}</div>,
@@ -172,11 +161,10 @@ vi.mock("~/components/ui/popover", () => ({
   PopoverContent: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }));
 
-
 vi.mock("../MechanicScheduler/MechanicScheduler", () => ({
   default: ({ mechanics, orders }: any) => (
     <div data-testid="mechanic-scheduler">
-      <h2>Harmonogram mechaników</h2>
+      <h2>Mechanic Scheduler</h2>
       <button data-testid="date-trigger">Friday, March 15, 2024</button>
       <div className="mechanic-rows">
         {mechanics.map((mech: any) => (
@@ -190,7 +178,6 @@ vi.mock("../MechanicScheduler/MechanicScheduler", () => ({
 }));
 
 describe("MechanicScheduler", () => {
-  
   beforeAll(() => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2024-03-15T12:00:00"));
@@ -200,7 +187,6 @@ describe("MechanicScheduler", () => {
     vi.useRealTimers();
   });
 
-  
   const mechanics: GetMechanicsResponse["data"] = [
     {
       id: "1",
@@ -217,7 +203,6 @@ describe("MechanicScheduler", () => {
     },
   ];
 
-  
   const orders: GetRepairOrdersResponse["data"] = [
     {
       id: "1",
@@ -242,7 +227,6 @@ describe("MechanicScheduler", () => {
   ];
 
   it("renders the scheduler with mechanics and appointments", async () => {
-    
     const queryClient = new QueryClient({
       defaultOptions: {
         queries: {
@@ -257,15 +241,12 @@ describe("MechanicScheduler", () => {
       </QueryClientProvider>,
     );
 
-    
-    expect(screen.getByText("Harmonogram mechaników")).toBeInTheDocument();
+    expect(screen.getByText("Mechanic Scheduler")).toBeInTheDocument();
 
-    
     expect(screen.getByText("Jan Kowalski")).toBeInTheDocument();
   });
 
   it("allows selecting a different date", async () => {
-    
     const queryClient = new QueryClient({
       defaultOptions: {
         queries: {
@@ -280,7 +261,6 @@ describe("MechanicScheduler", () => {
       </QueryClientProvider>,
     );
 
-    
     expect(screen.getByText("Friday, March 15, 2024")).toBeInTheDocument();
   });
 });

@@ -28,9 +28,12 @@ import {
   getAppointmentsForDate,
 } from "./helpers";
 import type { IAppointment, MechanicSchedulerProps } from "./types";
+import { useCurrentUserStore } from "~/store/useCurrentUserStore";
 
 const MechanicScheduler: React.FC<MechanicSchedulerProps> = ({ mechanics, orders }) => {
   const { mutateAsync: updateRepairOrder } = useUpdateRepairOrder();
+  const currentUser = useCurrentUserStore((state) => state.currentUser);
+  const isEmployee = currentUser?.role === "employee";
 
   const safeMechanics = Array.isArray(mechanics) ? mechanics : [];
   const safeOrders = Array.isArray(orders) ? orders : [];
@@ -189,15 +192,17 @@ const MechanicScheduler: React.FC<MechanicSchedulerProps> = ({ mechanics, orders
   return (
     <div className="mx-auto w-full max-w-6xl overflow-x-auto p-6">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-xl font-bold text-gray-800">Harmonogram mechaników</h2>
+        <h2 className="text-xl font-bold text-gray-800">Mechanic Scheduler</h2>
         <div className="flex items-center gap-4">
-          <AppointmentForm
-            defaultValues={{
-              startDate: selectedDate,
-              endDate: selectedDate,
-            }}
-            onClose={handleAppointmentClose}
-          />
+          {!isEmployee && (
+            <AppointmentForm
+              defaultValues={{
+                startDate: selectedDate,
+                endDate: selectedDate,
+              }}
+              onClose={handleAppointmentClose}
+            />
+          )}
         </div>
       </div>
 
@@ -276,6 +281,7 @@ const MechanicScheduler: React.FC<MechanicSchedulerProps> = ({ mechanics, orders
               appointments={appointments.filter((a) => a.mechanicId === mechanic.id)}
               onResize={handleResize}
               onAppointmentClick={handleAppointmentClick}
+              isEmployee={isEmployee}
             />
           ))}
 

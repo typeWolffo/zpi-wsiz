@@ -52,20 +52,31 @@ ApiClient.instance.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    if (
-      error.response?.status === 401 &&
-      !error.config._retry &&
-      useAuthStore.getState().isLoggedIn
-    ) {
-      error.config._retry = true;
-      try {
-        await ApiClient.api.authControllerRefreshTokens();
-        return ApiClient.instance(error.config);
-      } catch {
-        requestManager.abortAll();
-        return Promise.reject(error);
+    if (error.response?.status === 401) {
+      if (!error.config._retry && useAuthStore.getState().isLoggedIn) {
+        error.config._retry = true;
+        try {
+          await ApiClient.api.authControllerRefreshTokens();
+          return ApiClient.instance(error.config);
+        } catch {
+          requestManager.abortAll();
+
+          useAuthStore.getState().setLoggedIn(false);
+          useCurrentUserStore.getState().setCurrentUser(undefined);
+
+          window.location.href = "/login";
+          return Promise.reject(error);
+        }
+      } else if (!useAuthStore.getState().isLoggedIn) {
+        const isAuthEndpoint =
+          error.config?.url?.includes("/login") || error.config?.url?.includes("/register");
+
+        if (!isAuthEndpoint) {
+          window.location.href = "/login";
+        }
       }
     }
+
     return Promise.reject(error);
   },
 );

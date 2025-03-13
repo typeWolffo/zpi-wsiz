@@ -7,6 +7,7 @@ export const MechanicRow: React.FC<IMechanicRowProps> = ({
   appointments,
   onResize,
   onAppointmentClick,
+  isEmployee,
 }) => {
   const { setNodeRef, isOver } = useDroppable({
     id: `mechanic-${mechanic.id}`,
@@ -34,6 +35,7 @@ export const MechanicRow: React.FC<IMechanicRowProps> = ({
             {...appointment}
             onResize={onResize}
             onClick={onAppointmentClick}
+            isEmployee={isEmployee}
           />
         ))}
       </div>

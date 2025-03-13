@@ -15,19 +15,28 @@ import { useCustomerVehicleData } from "../hooks/useCustomerVehicleData";
 
 interface CustomerSectionProps {
   form: UseFormReturn<AppointmentFormValues>;
+  isEmployee: boolean;
 }
 
-export function CustomerSection({ form }: CustomerSectionProps) {
+export function CustomerSection({ form, isEmployee }: CustomerSectionProps) {
   const customerType = form.watch("customerType");
   const customerId = form.watch("customerId");
 
-  const { customers, vehicles, setSelectedCustomerId } = useCustomerVehicleData();
+  const {
+    customers = [],
+    vehicles = [],
+    setSelectedCustomerId,
+    isLoading,
+  } = useCustomerVehicleData();
 
   useEffect(() => {
     if (customerId) {
       setSelectedCustomerId(customerId);
     }
   }, [customerId, setSelectedCustomerId]);
+
+  const safeCustomers = Array.isArray(customers) ? customers : [];
+  const safeVehicles = Array.isArray(vehicles) ? vehicles : [];
 
   return (
     <>
@@ -42,6 +51,7 @@ export function CustomerSection({ form }: CustomerSectionProps) {
                 onValueChange={field.onChange}
                 defaultValue={field.value}
                 className="flex flex-col space-y-1"
+                disabled={isEmployee}
               >
                 <FormItem className="flex items-center space-x-3 space-y-0">
                   <FormControl>
@@ -72,16 +82,26 @@ export function CustomerSection({ form }: CustomerSectionProps) {
                 <FormLabel>Select Customer</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger disabled={isEmployee}>
                       <SelectValue placeholder="Select a customer" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {customers?.map((customer) => (
-                      <SelectItem key={customer.id} value={customer.id}>
-                        {customer.firstName} {customer.lastName} ({customer.email})
+                    {isLoading ? (
+                      <SelectItem value="loading" disabled>
+                        Loading customers...
                       </SelectItem>
-                    ))}
+                    ) : safeCustomers.length > 0 ? (
+                      safeCustomers.map((customer) => (
+                        <SelectItem key={customer.id} value={customer.id}>
+                          {customer.firstName} {customer.lastName} ({customer.email})
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value="no-customers" disabled>
+                        No customers found
+                      </SelectItem>
+                    )}
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -97,17 +117,27 @@ export function CustomerSection({ form }: CustomerSectionProps) {
                 <FormLabel>Select Vehicle</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger disabled={isEmployee}>
                       <SelectValue placeholder="Select a vehicle" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {vehicles?.map((vehicle) => (
-                      <SelectItem key={vehicle.id} value={vehicle.id}>
-                        {vehicle.make} {vehicle.model} ({vehicle.year}) -{" "}
-                        {vehicle.registrationNumber}
+                    {isLoading ? (
+                      <SelectItem value="loading" disabled>
+                        Loading vehicles...
                       </SelectItem>
-                    ))}
+                    ) : safeVehicles.length > 0 ? (
+                      safeVehicles.map((vehicle) => (
+                        <SelectItem key={vehicle.id} value={vehicle.id}>
+                          {vehicle.make} {vehicle.model} ({vehicle.year}) -{" "}
+                          {vehicle.registrationNumber}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value="no-vehicles" disabled>
+                        No vehicles found
+                      </SelectItem>
+                    )}
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -125,7 +155,7 @@ export function CustomerSection({ form }: CustomerSectionProps) {
                 <FormItem>
                   <FormLabel>First Name</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="Customer first name" />
+                    <Input {...field} placeholder="Customer first name" disabled={isEmployee} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -139,7 +169,7 @@ export function CustomerSection({ form }: CustomerSectionProps) {
                 <FormItem>
                   <FormLabel>Last Name</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="Customer last name" />
+                    <Input {...field} placeholder="Customer last name" disabled={isEmployee} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -155,7 +185,12 @@ export function CustomerSection({ form }: CustomerSectionProps) {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input {...field} type="email" placeholder="Customer email" />
+                    <Input
+                      {...field}
+                      type="email"
+                      placeholder="Customer email"
+                      disabled={isEmployee}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -169,7 +204,7 @@ export function CustomerSection({ form }: CustomerSectionProps) {
                 <FormItem>
                   <FormLabel>Phone Number</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="Customer phone number" />
+                    <Input {...field} placeholder="Customer phone number" disabled={isEmployee} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -185,7 +220,7 @@ export function CustomerSection({ form }: CustomerSectionProps) {
                 <FormItem>
                   <FormLabel>Make</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="Vehicle make" />
+                    <Input {...field} placeholder="Vehicle make" disabled={isEmployee} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -199,7 +234,7 @@ export function CustomerSection({ form }: CustomerSectionProps) {
                 <FormItem>
                   <FormLabel>Model</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="Vehicle model" />
+                    <Input {...field} placeholder="Vehicle model" disabled={isEmployee} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -215,7 +250,7 @@ export function CustomerSection({ form }: CustomerSectionProps) {
                 <FormItem>
                   <FormLabel>Year</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="Vehicle year" />
+                    <Input {...field} placeholder="Vehicle year" disabled={isEmployee} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -229,7 +264,7 @@ export function CustomerSection({ form }: CustomerSectionProps) {
                 <FormItem>
                   <FormLabel>VIN</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="Vehicle VIN" />
+                    <Input {...field} placeholder="Vehicle VIN" disabled={isEmployee} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -244,7 +279,11 @@ export function CustomerSection({ form }: CustomerSectionProps) {
               <FormItem>
                 <FormLabel>Registration Number</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="Vehicle registration number" />
+                  <Input
+                    {...field}
+                    placeholder="Vehicle registration number"
+                    disabled={isEmployee}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

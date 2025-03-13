@@ -13,9 +13,10 @@ import { timeOptions } from "../schema";
 
 interface DateTimeSectionProps {
   form: UseFormReturn<AppointmentFormValues>;
+  isEmployee: boolean;
 }
 
-export function DateTimeSection({ form }: DateTimeSectionProps) {
+export function DateTimeSection({ form, isEmployee }: DateTimeSectionProps) {
   return (
     <div className="grid grid-cols-2 gap-4">
       <div className="space-y-4">
@@ -31,6 +32,7 @@ export function DateTimeSection({ form }: DateTimeSectionProps) {
                   selected={field.value}
                   onSelect={field.onChange}
                   initialFocus
+                  disabled={isEmployee}
                 />
               </FormControl>
               <FormMessage />
@@ -45,7 +47,7 @@ export function DateTimeSection({ form }: DateTimeSectionProps) {
               <FormLabel>Start Time</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger disabled={isEmployee}>
                     <SelectValue placeholder="Select time" />
                   </SelectTrigger>
                 </FormControl>
@@ -76,6 +78,7 @@ export function DateTimeSection({ form }: DateTimeSectionProps) {
                   selected={field.value}
                   onSelect={field.onChange}
                   initialFocus
+                  disabled={isEmployee}
                 />
               </FormControl>
               <FormMessage />
@@ -90,7 +93,7 @@ export function DateTimeSection({ form }: DateTimeSectionProps) {
               <FormLabel>End Time</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger disabled={isEmployee}>
                     <SelectValue placeholder="Select time" />
                   </SelectTrigger>
                 </FormControl>

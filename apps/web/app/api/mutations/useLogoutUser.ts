@@ -6,10 +6,12 @@ import { queryClient } from "../queryClient";
 import { useAuthStore } from "~/store/authStore";
 import { useNavigate } from "react-router";
 import { currentUserQueryOptions } from "../queries/useCurrentUser";
+import { useCurrentUserStore } from "~/store/useCurrentUserStore";
 
 export function useLogoutUser() {
   const { setLoggedIn } = useAuthStore();
   const navigate = useNavigate();
+  const { setCurrentUser } = useCurrentUserStore();
 
   return useMutation({
     mutationFn: async () => {
@@ -22,20 +24,14 @@ export function useLogoutUser() {
     onSuccess: () => {
       queryClient.cancelQueries(currentUserQueryOptions);
       queryClient.clear();
-      navigate("/auth/login");
+      setCurrentUser(undefined);
+      navigate("/login");
     },
     onError: (error) => {
       if (error instanceof AxiosError) {
-        
-        
-        
-        
         alert(error.response?.data.message);
       }
-      
-      
-      
-      
+
       return alert(error.message);
     },
   });

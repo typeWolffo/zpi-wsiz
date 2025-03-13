@@ -7,29 +7,34 @@ export function useCustomerVehicleData(initialCustomerId?: string) {
     initialCustomerId,
   );
 
-  const { data: customers } = useQuery({
+  const { data: customersResponse, isLoading: isLoadingCustomers } = useQuery({
     queryKey: ["customers"],
     queryFn: async () => {
       const response = await ApiClient.api.customerControllerGetCustomers();
-      return response.data.data;
+      return response.data;
     },
   });
 
-  const { data: vehicles } = useQuery({
+  const customers = Array.isArray(customersResponse?.data) ? customersResponse?.data : [];
+
+  const { data: vehiclesResponse, isLoading: isLoadingVehicles } = useQuery({
     queryKey: ["vehicles", selectedCustomerId],
     queryFn: async () => {
       if (!selectedCustomerId) return null;
       const response =
         await ApiClient.api.vehicleControllerGetVehiclesByCustomerId(selectedCustomerId);
-      return response.data.data;
+      return response.data;
     },
     enabled: !!selectedCustomerId,
   });
+
+  const vehicles = Array.isArray(vehiclesResponse?.data) ? vehiclesResponse?.data : [];
 
   return {
     customers,
     vehicles,
     selectedCustomerId,
     setSelectedCustomerId,
+    isLoading: isLoadingCustomers || isLoadingVehicles,
   };
 }

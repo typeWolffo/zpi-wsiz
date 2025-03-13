@@ -17,6 +17,7 @@ export const Appointment: React.FC<IAppointmentProps> = ({
   mechanicId,
   onResize,
   onClick,
+  isEmployee,
 }) => {
   const [isResizing, setIsResizing] = useState(false);
   const [startResizeX, setStartResizeX] = useState<number | null>(null);
@@ -26,10 +27,10 @@ export const Appointment: React.FC<IAppointmentProps> = ({
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id,
     data: { type: "appointment", id, mechanicId },
+    disabled: isEmployee,
   });
 
   const handleClick = (e: React.MouseEvent) => {
-    
     if (transform || isResizing) return;
     onClick(id);
   };
@@ -41,7 +42,8 @@ export const Appointment: React.FC<IAppointmentProps> = ({
   };
 
   const handleResizeStart = (e: React.MouseEvent) => {
-    e.stopPropagation(); 
+    if (isEmployee) return;
+    e.stopPropagation();
 
     if (appointmentRef.current) {
       setIsResizing(true);
@@ -54,30 +56,17 @@ export const Appointment: React.FC<IAppointmentProps> = ({
   };
 
   const handleResizeMove = (e: MouseEvent) => {
+    if (isEmployee) return;
     if (isResizing && startResizeX !== null && initialWidth !== null && appointmentRef.current) {
       const deltaX = e.clientX - startResizeX;
-      const containerWidth =
-        appointmentRef.current.parentElement?.getBoundingClientRect().width || 1;
 
-      
-      const deltaPercentage = (deltaX / containerWidth) * 100;
-
-      
-      const deltaMinutes = Math.round((deltaPercentage / 100) * 660);
-
-      
-      const roundedDeltaMinutes = Math.round(deltaMinutes / 15) * 15;
-
-      
-      const newDuration = Math.max(15, duration + roundedDeltaMinutes);
-
-      
       const newWidth = initialWidth + deltaX;
       appointmentRef.current.style.width = `${Math.max(30, newWidth)}px`;
     }
   };
 
   const handleResizeEnd = (e: MouseEvent) => {
+    if (isEmployee) return;
     if (isResizing && startResizeX !== null && initialWidth !== null && appointmentRef.current) {
       const deltaX = e.clientX - startResizeX;
       const containerWidth =
@@ -88,10 +77,8 @@ export const Appointment: React.FC<IAppointmentProps> = ({
       const roundedDeltaMinutes = Math.round(deltaMinutes / 15) * 15;
       const newDuration = Math.max(15, duration + roundedDeltaMinutes);
 
-      
       onResize(id, newDuration);
 
-      
       appointmentRef.current.style.width = "";
       setIsResizing(false);
       setStartResizeX(null);
@@ -177,11 +164,13 @@ export const Appointment: React.FC<IAppointmentProps> = ({
           {customerName} - {registrationNumber}
         </div>
       </div>
-      <div
-        className="absolute right-0 top-0 h-full w-2 cursor-ew-resize hover:bg-white hover:bg-opacity-20"
-        onMouseDown={handleResizeStart}
-        onClick={(e) => e.stopPropagation()}
-      />
+      {!isEmployee && (
+        <div
+          className="absolute right-0 top-0 h-full w-2 cursor-ew-resize hover:bg-white hover:bg-opacity-20"
+          onMouseDown={handleResizeStart}
+          onClick={(e) => e.stopPropagation()}
+        />
+      )}
     </div>
   );
 };

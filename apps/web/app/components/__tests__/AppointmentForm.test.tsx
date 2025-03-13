@@ -4,7 +4,6 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import userEvent from "@testing-library/user-event";
 
-
 vi.mock("~/api/queries/getCustomers", () => ({
   customersQueryOptions: () => ({
     queryKey: ["customers"],
@@ -54,13 +53,27 @@ vi.mock("~/api/mutations/useCreateVehicle", () => ({
   }),
 }));
 
+vi.mock("~/store/useCurrentUserStore", () => ({
+  useCurrentUserStore: (selector: (state: any) => any) => {
+    const mockStore = {
+      currentUser: {
+        id: "user-1",
+        role: "admin",
+        firstName: "Test",
+        lastName: "User",
+        email: "test@example.com",
+      },
+      setCurrentUser: vi.fn(),
+    };
+    return selector(mockStore);
+  },
+}));
 
 vi.mock("react-router", () => ({
   useNavigate: () => vi.fn(),
   useParams: () => ({}),
   useLocation: () => ({ pathname: "/" }),
 }));
-
 
 vi.mock("~/components/ui/sheet", () => ({
   Sheet: ({ children }: { children: React.ReactNode }) => <div data-testid="sheet">{children}</div>,
@@ -90,7 +103,6 @@ describe("AppointmentForm", () => {
     },
   });
 
-  
   afterEach(() => {
     queryClient.clear();
     vi.clearAllMocks();
@@ -103,7 +115,6 @@ describe("AppointmentForm", () => {
       </QueryClientProvider>,
     );
 
-    
     expect(screen.getByTestId("sheet-title")).toBeInTheDocument();
     expect(screen.getByText("Nowa wizyta")).toBeInTheDocument();
   });
@@ -118,15 +129,12 @@ describe("AppointmentForm", () => {
       </QueryClientProvider>,
     );
 
-    
     await waitFor(() => {
       expect(screen.getByTestId("sheet-content")).toBeInTheDocument();
     });
 
-    
     onCloseMock();
 
-    
     expect(onCloseMock).toHaveBeenCalled();
   });
 
@@ -140,10 +148,8 @@ describe("AppointmentForm", () => {
       </QueryClientProvider>,
     );
 
-    
     onCloseMock();
 
-    
     expect(onCloseMock).toHaveBeenCalled();
   });
 });
