@@ -2,6 +2,7 @@ import { useDraggable } from "@dnd-kit/core";
 import { useState, useRef } from "react";
 import { calculateAppointmentStyle, isMultiDayAppointment } from "./helpers";
 import type { IAppointmentProps } from "./types";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/components/ui/tooltip";
 
 export const Appointment: React.FC<IAppointmentProps> = ({
   id,
@@ -140,37 +141,45 @@ export const Appointment: React.FC<IAppointmentProps> = ({
     : {};
 
   return (
-    <div
-      ref={(node) => {
-        setNodeRef(node);
-        appointmentRef.current = node;
-      }}
-      style={{
-        ...style,
-        ...multiDayStyles,
-        position: "absolute",
-        zIndex: isResizing ? 20 : 10,
-        cursor: isResizing ? "ew-resize" : "pointer",
-      }}
-      className="flex h-24 items-center justify-between overflow-hidden rounded px-2 text-white"
-      title={tooltipContent}
-      {...(isResizing ? {} : attributes)}
-      {...(isResizing ? {} : listeners)}
-      onClick={handleClick}
-    >
-      <div className="flex flex-col overflow-hidden">
-        <div className="truncate text-sm font-medium">{car}</div>
-        <div className="truncate text-xs">
-          {customerName} - {registrationNumber}
-        </div>
-      </div>
-      {!isEmployee && (
-        <div
-          className="absolute right-0 top-0 h-full w-2 cursor-ew-resize hover:bg-white hover:bg-opacity-20"
-          onMouseDown={handleResizeStart}
-          onClick={(e) => e.stopPropagation()}
-        />
-      )}
-    </div>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div
+            ref={(node) => {
+              setNodeRef(node);
+              appointmentRef.current = node;
+            }}
+            style={{
+              ...style,
+              ...multiDayStyles,
+              position: "absolute",
+              zIndex: isResizing ? 20 : 10,
+              cursor: isResizing ? "ew-resize" : "pointer",
+            }}
+            className="flex h-24 items-center justify-between overflow-hidden rounded px-2 text-white"
+            {...(isResizing ? {} : attributes)}
+            {...(isResizing ? {} : listeners)}
+            onClick={handleClick}
+          >
+            <div className="flex flex-col overflow-hidden">
+              <div className="truncate text-sm font-medium">{car}</div>
+              <div className="truncate text-xs">
+                {customerName} - {registrationNumber}
+              </div>
+            </div>
+            {!isEmployee && (
+              <div
+                className="absolute right-0 top-0 h-full w-2 cursor-ew-resize hover:bg-white hover:bg-opacity-20"
+                onMouseDown={handleResizeStart}
+                onClick={(e) => e.stopPropagation()}
+              />
+            )}
+          </div>
+        </TooltipTrigger>
+        <TooltipContent side="top" className="max-w-xs whitespace-pre-line">
+          {tooltipContent}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 };

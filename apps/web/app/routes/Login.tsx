@@ -7,8 +7,9 @@ import { z } from "zod";
 import type { LoginBody } from "~/api/generated-api";
 import { Link, useNavigate } from "react-router";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
-import { Label } from "@radix-ui/react-label";
+import { Label } from "~/components/ui/label";
 import { Input } from "~/components/ui/input";
+import { Checkbox } from "~/components/ui/checkbox";
 import { cn } from "~/lib/utils";
 
 export function meta({}: Route.MetaArgs) {
@@ -85,6 +86,11 @@ export default function Login() {
               name="rememberMe"
               render={({ field }) => (
                 <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="rememberMe"
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
                   <Label
                     htmlFor="rememberMe"
                     className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -98,12 +104,6 @@ export default function Login() {
               Login
             </Button>
           </form>
-          <div className="mt-4 text-center text-sm">
-            Don't have an account yet?{" "}
-            <Link to="/auth/register" className="underline">
-              Register
-            </Link>
-          </div>
         </CardContent>
       </Card>
     </div>
