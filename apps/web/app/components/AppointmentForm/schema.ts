@@ -1,7 +1,7 @@
 import * as z from "zod";
 
 export const timeOptions = Array.from({ length: (18 - 7) * 4 + 1 }, (_, i) => {
-  const hour = Math.floor(i / 4) + 7; // Start from 7:00
+  const hour = Math.floor(i / 4) + 7; 
   const minute = (i % 4) * 15;
   return {
     value: `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`,
@@ -12,23 +12,23 @@ export const timeOptions = Array.from({ length: (18 - 7) * 4 + 1 }, (_, i) => {
 export const appointmentFormSchema = z
   .object({
     description: z.string().min(1, "Description is required"),
-    // Customer selection
+    
     customerType: z.enum(["existing", "new"]),
     customerId: z.string().optional(),
-    // Vehicle selection
+    
     vehicleId: z.string().optional(),
-    // New customer details
+    
     customerFirstName: z.string().optional(),
     customerLastName: z.string().optional(),
     customerEmail: z.string().optional(),
     customerPhoneNumber: z.string().optional(),
-    // New vehicle details
+    
     make: z.string().optional(),
     model: z.string().optional(),
     year: z.string().optional(),
     vin: z.string().optional(),
     registrationNumber: z.string().optional(),
-    // Appointment details
+    
     startDate: z.date(),
     startTime: z.string(),
     endDate: z.date(),
@@ -116,7 +116,7 @@ export const appointmentFormSchema = z
       }
     }
 
-    // Validate that end date/time is after start date/time
+    
     const startDateTime = new Date(data.startDate);
     const endDateTime = new Date(data.endDate);
     startDateTime.setHours(

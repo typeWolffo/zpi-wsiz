@@ -1,10 +1,10 @@
 import type { GetMechanicsResponse, GetRepairOrdersResponse } from "~/api/generated-api";
 
-// Typy z API
+
 export type MechanicAPI = GetMechanicsResponse["data"][number];
 export type RepairOrderAPI = GetRepairOrdersResponse["data"][number];
 
-// Typy komponentów
+
 export interface ITimeStart {
   hour: number;
   minute: number;

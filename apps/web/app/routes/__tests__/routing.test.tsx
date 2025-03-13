@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { RouterProvider, createMemoryRouter } from "react-router";
 import { Link, Outlet, useNavigate } from "react-router";
 
-// Przykładowy komponent z przyciskiem nawigacyjnym
+
 const NavigationButton = () => {
   return (
     <Link to="/about">
@@ -13,7 +13,7 @@ const NavigationButton = () => {
   );
 };
 
-// Przykładowe komponenty stron
+
 const HomePage = () => (
   <div>
     <h1>Home Page</h1>
@@ -24,7 +24,7 @@ const HomePage = () => (
 const AboutPage = () => <h1>About Us</h1>;
 const ContactPage = () => <h1>Contact Page</h1>;
 
-// Komponent Layout
+
 const Layout = () => (
   <div>
     <nav>
@@ -40,7 +40,7 @@ const Layout = () => (
 
 describe("React Router 7 navigation testing", () => {
   it("renders the home page initially", () => {
-    // Defining routes
+    
     const routes = [
       {
         path: "/",
@@ -53,22 +53,22 @@ describe("React Router 7 navigation testing", () => {
       },
     ];
 
-    // Creating router with initial path "/"
+    
     const router = createMemoryRouter(routes, {
       initialEntries: ["/"],
     });
 
-    // Rendering the application
+    
     render(<RouterProvider router={router} />);
 
-    // Check if we are on the home page
+    
     expect(screen.getByText("Home Page")).toBeInTheDocument();
   });
 
   it("navigates to about page when clicked on navigation button", async () => {
     const user = userEvent.setup();
 
-    // Defining routes
+    
     const routes = [
       {
         path: "/",
@@ -81,19 +81,19 @@ describe("React Router 7 navigation testing", () => {
       },
     ];
 
-    // Creating router with initial path "/"
+    
     const router = createMemoryRouter(routes, {
       initialEntries: ["/"],
     });
 
-    // Rendering the application
+    
     render(<RouterProvider router={router} />);
 
-    // Click on navigation button
+    
     const button = screen.getByText("Go to About");
     await user.click(button);
 
-    // Check if we are on the "About" page
+    
     await waitFor(() => {
       expect(screen.getByText("About Us")).toBeInTheDocument();
     });

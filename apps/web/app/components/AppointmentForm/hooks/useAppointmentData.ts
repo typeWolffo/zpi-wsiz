@@ -49,13 +49,13 @@ export function useAppointmentData(appointmentId?: string) {
 
   const isLoading = isLoadingAppointment || isLoadingVehicle || isLoadingCustomer;
 
-  // Helper function to round time to nearest valid option
+  
   const roundToNearestTimeSlot = (date: Date) => {
     const hours = date.getHours();
     const minutes = date.getMinutes();
     const roundedMinutes = Math.round(minutes / 15) * 15;
 
-    // Handle edge case where rounding minutes to 60
+    
     let adjustedHours = hours;
     let adjustedMinutes = roundedMinutes;
 
@@ -64,13 +64,13 @@ export function useAppointmentData(appointmentId?: string) {
       adjustedMinutes = 0;
     }
 
-    // Ensure hours are within 7-18 range
+    
     adjustedHours = Math.max(7, Math.min(18, adjustedHours));
 
     return `${String(adjustedHours).padStart(2, "0")}:${String(adjustedMinutes).padStart(2, "0")}`;
   };
 
-  // Process appointment times for form - memoize this function to prevent unnecessary rerenders
+  
   const getFormattedTimes = useMemo(() => {
     return () => {
       if (!appointmentData) return null;

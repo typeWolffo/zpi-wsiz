@@ -27,7 +27,7 @@ RUN mkdir -p ./dist
 
 COPY --from=builder /app/apps/api/dist/ ./dist/
 
-COPY --from=builder /app/apps/api/.env ./.env
+# COPY --from=builder /app/apps/api/.env ./.env
 
 EXPOSE 3000
 

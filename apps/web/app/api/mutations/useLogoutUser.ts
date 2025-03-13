@@ -26,16 +26,16 @@ export function useLogoutUser() {
     },
     onError: (error) => {
       if (error instanceof AxiosError) {
-        // return toast({
-        //   variant: "destructive",
-        //   description: error.response?.data.message,
-        // });
+        
+        
+        
+        
         alert(error.response?.data.message);
       }
-      // toast({
-      //   variant: "destructive",
-      //   description: error.message,
-      // });
+      
+      
+      
+      
       return alert(error.message);
     },
   });

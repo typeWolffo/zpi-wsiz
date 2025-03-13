@@ -29,7 +29,7 @@ export const Appointment: React.FC<IAppointmentProps> = ({
   });
 
   const handleClick = (e: React.MouseEvent) => {
-    // Prevent click when dragging or resizing
+    
     if (transform || isResizing) return;
     onClick(id);
   };
@@ -41,7 +41,7 @@ export const Appointment: React.FC<IAppointmentProps> = ({
   };
 
   const handleResizeStart = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent drag start
+    e.stopPropagation(); 
 
     if (appointmentRef.current) {
       setIsResizing(true);
@@ -59,19 +59,19 @@ export const Appointment: React.FC<IAppointmentProps> = ({
       const containerWidth =
         appointmentRef.current.parentElement?.getBoundingClientRect().width || 1;
 
-      // Calculate percentage of day
+      
       const deltaPercentage = (deltaX / containerWidth) * 100;
 
-      // Convert to minutes (assuming 11-hour day from 7:00 to 18:00 = 660 minutes)
+      
       const deltaMinutes = Math.round((deltaPercentage / 100) * 660);
 
-      // Round to nearest 15 minutes
+      
       const roundedDeltaMinutes = Math.round(deltaMinutes / 15) * 15;
 
-      // Calculate new duration (minimum 15 minutes)
+      
       const newDuration = Math.max(15, duration + roundedDeltaMinutes);
 
-      // Update width during drag
+      
       const newWidth = initialWidth + deltaX;
       appointmentRef.current.style.width = `${Math.max(30, newWidth)}px`;
     }
@@ -88,10 +88,10 @@ export const Appointment: React.FC<IAppointmentProps> = ({
       const roundedDeltaMinutes = Math.round(deltaMinutes / 15) * 15;
       const newDuration = Math.max(15, duration + roundedDeltaMinutes);
 
-      // Call parent's resize handler
+      
       onResize(id, newDuration);
 
-      // Reset styles and state
+      
       appointmentRef.current.style.width = "";
       setIsResizing(false);
       setStartResizeX(null);

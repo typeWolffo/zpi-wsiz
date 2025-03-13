@@ -3,7 +3,7 @@ import { Appointment } from "../MechanicScheduler/Appointment";
 import { renderWithRouter, screen } from "../../utils/test-utils";
 import type { ITimeStart } from "../MechanicScheduler/types";
 
-// Mock dla react-dnd-kit
+
 vi.mock("@dnd-kit/core", () => ({
   useDraggable: () => ({
     attributes: {},
@@ -22,7 +22,7 @@ vi.mock("@dnd-kit/core", () => ({
 }));
 
 describe("Appointment", () => {
-  // Mock data for the Appointment component
+  
   const appointmentProps = {
     id: "1",
     car: "Toyota Corolla",
@@ -47,7 +47,7 @@ describe("Appointment", () => {
       </div>,
     );
 
-    // Check if the car name is displayed
+    
     expect(container.textContent).toContain("Toyota Corolla");
   });
 
@@ -58,7 +58,7 @@ describe("Appointment", () => {
       </div>,
     );
 
-    // Check if the customer name is displayed
+    
     expect(container.textContent).toContain("Adam Nowak");
   });
 
@@ -69,7 +69,7 @@ describe("Appointment", () => {
       </div>,
     );
 
-    // Check if the registration number is displayed
+    
     expect(container.textContent).toContain("ABC 1234");
   });
 
@@ -82,12 +82,12 @@ describe("Appointment", () => {
       </div>,
     );
 
-    // Znajdź element wizyty i kliknij go
+    
     const appointmentElement = container.querySelector(".flex.h-24");
     if (appointmentElement) {
       await user.click(appointmentElement);
 
-      // Sprawdź, czy funkcja onClick została wywołana z odpowiednim ID
+      
       expect(onClickMock).toHaveBeenCalledWith("1");
     }
   });

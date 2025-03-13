@@ -4,7 +4,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import userEvent from "@testing-library/user-event";
 
-// Mock dla React Query
+
 vi.mock("~/api/queries/getCustomers", () => ({
   customersQueryOptions: () => ({
     queryKey: ["customers"],
@@ -54,14 +54,14 @@ vi.mock("~/api/mutations/useCreateVehicle", () => ({
   }),
 }));
 
-// Mock dla react-router
+
 vi.mock("react-router", () => ({
   useNavigate: () => vi.fn(),
   useParams: () => ({}),
   useLocation: () => ({ pathname: "/" }),
 }));
 
-// Mock dla komponentu Sheet z shadcn/ui
+
 vi.mock("~/components/ui/sheet", () => ({
   Sheet: ({ children }: { children: React.ReactNode }) => <div data-testid="sheet">{children}</div>,
   SheetContent: ({ children }: { children: React.ReactNode }) => (
@@ -90,7 +90,7 @@ describe("AppointmentForm", () => {
     },
   });
 
-  // Resetuj queryClient po każdym teście
+  
   afterEach(() => {
     queryClient.clear();
     vi.clearAllMocks();
@@ -103,7 +103,7 @@ describe("AppointmentForm", () => {
       </QueryClientProvider>,
     );
 
-    // Sprawdź, czy formularz jest wyświetlany
+    
     expect(screen.getByTestId("sheet-title")).toBeInTheDocument();
     expect(screen.getByText("Nowa wizyta")).toBeInTheDocument();
   });
@@ -118,15 +118,15 @@ describe("AppointmentForm", () => {
       </QueryClientProvider>,
     );
 
-    // Symulujemy wypełnienie formularza
+    
     await waitFor(() => {
       expect(screen.getByTestId("sheet-content")).toBeInTheDocument();
     });
 
-    // Bezpośrednio wywołujemy onClose, aby zasymulować kliknięcie przycisku Zapisz
+    
     onCloseMock();
 
-    // Sprawdź, czy funkcja onClose została wywołana
+    
     expect(onCloseMock).toHaveBeenCalled();
   });
 
@@ -140,10 +140,10 @@ describe("AppointmentForm", () => {
       </QueryClientProvider>,
     );
 
-    // Bezpośrednio wywołujemy onClose, aby zasymulować kliknięcie przycisku Anuluj
+    
     onCloseMock();
 
-    // Sprawdź, czy funkcja onClose została wywołana
+    
     expect(onCloseMock).toHaveBeenCalled();
   });
 });

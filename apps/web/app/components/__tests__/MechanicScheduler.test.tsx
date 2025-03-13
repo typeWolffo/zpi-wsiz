@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { GetMechanicsResponse, GetRepairOrdersResponse } from "~/api/generated-api";
 import type { ReactNode } from "react";
 
-// Mock dla @dnd-kit/core z kompletną implementacją
+
 vi.mock("@dnd-kit/core", () => ({
   DndContext: ({
     children,
@@ -52,14 +52,14 @@ vi.mock("@dnd-kit/core", () => ({
   KeyboardCode: { Space: "Space", ArrowRight: "ArrowRight" },
 }));
 
-// Mock dla @dnd-kit/modifiers
+
 vi.mock("@dnd-kit/modifiers", () => ({
   restrictToWindowEdges: vi.fn(),
   restrictToVerticalAxis: vi.fn(),
   restrictToHorizontalAxis: vi.fn(),
 }));
 
-// Mock dla @dnd-kit/sortable
+
 vi.mock("@dnd-kit/sortable", () => ({
   sortableKeyboardCoordinates: vi.fn(),
   arrayMove: vi.fn(),
@@ -74,7 +74,7 @@ vi.mock("@dnd-kit/sortable", () => ({
   }),
 }));
 
-// Mockujemy komponent MechanicRow, aby uniknąć złożoności
+
 vi.mock("../MechanicScheduler/MechanicRow", () => ({
   MechanicRow: ({ mechanic, appointments, onResize, onAppointmentClick }: any) => (
     <div data-testid={`mechanic-row-${mechanic.id}`}>
@@ -90,7 +90,7 @@ vi.mock("../MechanicScheduler/MechanicRow", () => ({
   ),
 }));
 
-// Mockujemy komponent Appointment, aby uniknąć złożoności
+
 vi.mock("../MechanicScheduler/Appointment", () => ({
   Appointment: ({ id, car, customerName, onClick }: any) => (
     <div data-testid={`appointment-${id}`} onClick={() => onClick(id)}>
@@ -99,10 +99,10 @@ vi.mock("../MechanicScheduler/Appointment", () => ({
   ),
 }));
 
-// Importujemy MechanicScheduler po zdefiniowaniu mocków
+
 import MechanicScheduler from "../MechanicScheduler/MechanicScheduler";
 
-// Mock dla komponentu Calendar, aby nie uruchamiać rzeczywistego interfejsu kalendarza
+
 vi.mock("../ui/calendar", () => ({
   Calendar: ({
     mode,
@@ -128,7 +128,7 @@ vi.mock("../ui/calendar", () => ({
   },
 }));
 
-// Mock dla React Query
+
 vi.mock("~/api/mutations/useUpdateOrder", () => ({
   useUpdateRepairOrder: () => ({
     mutateAsync: vi.fn().mockResolvedValue({ id: "1" }),
@@ -136,7 +136,7 @@ vi.mock("~/api/mutations/useUpdateOrder", () => ({
   }),
 }));
 
-// Mockujemy moduł queryClient
+
 vi.mock("~/api/queryClient", () => {
   const mockQueryClient = new QueryClient({
     defaultOptions: {
@@ -150,7 +150,7 @@ vi.mock("~/api/queryClient", () => {
   };
 });
 
-// Mockujemy moduł api-client, który importuje queryClient
+
 vi.mock("~/api/api-client", () => ({
   requestManager: {
     getToken: vi.fn(),
@@ -162,7 +162,7 @@ vi.mock("~/api/api-client", () => ({
   },
 }));
 
-// Mock dla popover z shadcn/ui używanego do kalendarza
+
 vi.mock("~/components/ui/popover", () => ({
   Popover: ({ children }: { children: ReactNode }) => <div data-testid="popover">{children}</div>,
   PopoverAnchor: ({ children }: { children: ReactNode }) => <div>{children}</div>,
@@ -172,7 +172,7 @@ vi.mock("~/components/ui/popover", () => ({
   PopoverContent: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }));
 
-// Bezpośrednio mockujemy component MechanicScheduler, pozostawiając tylko proste API
+
 vi.mock("../MechanicScheduler/MechanicScheduler", () => ({
   default: ({ mechanics, orders }: any) => (
     <div data-testid="mechanic-scheduler">
@@ -190,7 +190,7 @@ vi.mock("../MechanicScheduler/MechanicScheduler", () => ({
 }));
 
 describe("MechanicScheduler", () => {
-  // Ustaw stałą datę dla testów
+  
   beforeAll(() => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2024-03-15T12:00:00"));
@@ -200,7 +200,7 @@ describe("MechanicScheduler", () => {
     vi.useRealTimers();
   });
 
-  // Uproszczone dane mechaników i zleceń, aby testy były szybsze
+  
   const mechanics: GetMechanicsResponse["data"] = [
     {
       id: "1",
@@ -217,7 +217,7 @@ describe("MechanicScheduler", () => {
     },
   ];
 
-  // Uproszczone dane zleceń
+  
   const orders: GetRepairOrdersResponse["data"] = [
     {
       id: "1",
@@ -242,7 +242,7 @@ describe("MechanicScheduler", () => {
   ];
 
   it("renders the scheduler with mechanics and appointments", async () => {
-    // Użyj nowego QueryClient dla tego testu
+    
     const queryClient = new QueryClient({
       defaultOptions: {
         queries: {
@@ -257,15 +257,15 @@ describe("MechanicScheduler", () => {
       </QueryClientProvider>,
     );
 
-    // Sprawdź, czy tytuł jest wyświetlany
+    
     expect(screen.getByText("Harmonogram mechaników")).toBeInTheDocument();
 
-    // Sprawdź, czy mechanicy są wyświetlani
+    
     expect(screen.getByText("Jan Kowalski")).toBeInTheDocument();
   });
 
   it("allows selecting a different date", async () => {
-    // Użyj nowego QueryClient dla tego testu
+    
     const queryClient = new QueryClient({
       defaultOptions: {
         queries: {
@@ -280,7 +280,7 @@ describe("MechanicScheduler", () => {
       </QueryClientProvider>,
     );
 
-    // Sprawdź, czy data jest wyświetlana
+    
     expect(screen.getByText("Friday, March 15, 2024")).toBeInTheDocument();
   });
 });

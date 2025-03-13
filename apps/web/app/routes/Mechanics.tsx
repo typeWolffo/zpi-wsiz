@@ -132,7 +132,7 @@ export default function Mechanics() {
         firstName: data.firstName,
         lastName: data.lastName,
         email: data.email,
-        role: "employee", // assuming mechanics are employees
+        role: "employee", 
       },
       mechanic: {
         shiftStart: data.shiftStart,

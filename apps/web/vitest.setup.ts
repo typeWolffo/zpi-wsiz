@@ -2,12 +2,12 @@ import "@testing-library/jest-dom";
 import { afterEach, vi } from "vitest";
 import { cleanup } from "@testing-library/react";
 
-// Automatyczne czyszczenie po każdym teście
+
 afterEach(() => {
   cleanup();
 });
 
-// Mock dla ResizeObserver
+
 class ResizeObserverMock {
   observe() {}
   unobserve() {}
@@ -16,7 +16,7 @@ class ResizeObserverMock {
 
 global.ResizeObserver = ResizeObserverMock as any;
 
-// Mock dla IntersectionObserver
+
 class IntersectionObserverMock {
   constructor(callback: IntersectionObserverCallback) {
     this.callback = callback;
@@ -37,7 +37,7 @@ class IntersectionObserverMock {
 
 global.IntersectionObserver = IntersectionObserverMock as any;
 
-// Mock dla XMLHttpRequest, aby zapobiec rzeczywistym żądaniom HTTP podczas testów
+
 class XMLHttpRequestMock {
   onload: (() => void) | null = null;
   onerror: (() => void) | null = null;
@@ -74,7 +74,7 @@ class XMLHttpRequestMock {
 
 global.XMLHttpRequest = XMLHttpRequestMock as any;
 
-// Mock dla React Router 7
+
 vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
 
@@ -89,7 +89,7 @@ vi.mock("react-router", async () => {
   };
 });
 
-// Mock dla funkcji window.matchMedia
+
 Object.defineProperty(window, "matchMedia", {
   writable: true,
   value: vi.fn().mockImplementation((query) => ({
@@ -104,7 +104,7 @@ Object.defineProperty(window, "matchMedia", {
   })),
 });
 
-// Dodaj mock dla localStorage
+
 const localStorageMock = (() => {
   let store: Record<string, string> = {};
   return {

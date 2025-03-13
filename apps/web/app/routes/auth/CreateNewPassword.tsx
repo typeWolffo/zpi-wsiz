@@ -68,7 +68,7 @@ export default function CreateNewPassword() {
 
     try {
       if (createToken) {
-        // Dokończenie rejestracji konta (nowy użytkownik)
+        
         await createPassword({
           data: {
             password: data.password,
@@ -76,7 +76,7 @@ export default function CreateNewPassword() {
           },
         });
       } else if (resetToken) {
-        // Resetowanie hasła (istniejący użytkownik)
+        
         await resetPassword({
           data: {
             newPassword: data.password,
@@ -87,7 +87,7 @@ export default function CreateNewPassword() {
 
       navigate("/login");
     } catch (error) {
-      // Błędy już są obsługiwane w hooku
+      
     } finally {
       setIsSubmitting(false);
     }

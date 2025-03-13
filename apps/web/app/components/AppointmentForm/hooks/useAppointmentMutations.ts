@@ -99,7 +99,7 @@ export function useAppointmentMutations(appointmentId?: string, onSuccessCallbac
     },
   });
 
-  // Combined function to handle either create or update
+  
   const submitAppointment = async (data: AppointmentFormValues) => {
     try {
       if (appointmentId) {

@@ -4,19 +4,19 @@ import { renderWithRouter, screen } from "../../utils/test-utils";
 import type { ITimeStart, IMechanic, IAppointment } from "../MechanicScheduler/types";
 
 describe("MechanicRow", () => {
-  // Przykładowa godzina rozpoczęcia zmiany
+  
   const shiftStart: ITimeStart = {
     hour: 9,
     minute: 0,
   };
 
-  // Przykładowa godzina zakończenia zmiany
+  
   const shiftEnd: ITimeStart = {
     hour: 17,
     minute: 0,
   };
 
-  // Mockowy mechanik
+  
   const mechanic: IMechanic = {
     id: "1",
     firstName: "Jan",
@@ -25,7 +25,7 @@ describe("MechanicRow", () => {
     shiftEnd,
   };
 
-  // Mockowa wizyta
+  
   const appointments: IAppointment[] = [
     {
       id: "1",
@@ -34,7 +34,7 @@ describe("MechanicRow", () => {
         hour: 10,
         minute: 0,
       },
-      duration: 60, // 60 minut
+      duration: 60, 
       description: "Wymiana oleju",
       customerName: "Adam Nowak",
       registrationNumber: "ABC 1234",
@@ -47,7 +47,7 @@ describe("MechanicRow", () => {
         hour: 14,
         minute: 30,
       },
-      duration: 90, // 90 minut
+      duration: 90, 
       description: "Naprawa zawieszenia",
       customerName: "Anna Wiśniewska",
       registrationNumber: "DEF 5678",
@@ -55,7 +55,7 @@ describe("MechanicRow", () => {
     },
   ];
 
-  // Mock funkcji
+  
   const onResizeMock = vi.fn();
   const onAppointmentClickMock = vi.fn();
 
@@ -69,7 +69,7 @@ describe("MechanicRow", () => {
       />,
     );
 
-    // Sprawdź, czy imię i nazwisko mechanika jest wyświetlane
+    
     expect(screen.getByText("Jan Kowalski")).toBeInTheDocument();
   });
 
@@ -83,7 +83,7 @@ describe("MechanicRow", () => {
       />,
     );
 
-    // Sprawdź, czy wizyty są wyświetlane
+    
     expect(screen.getByText("Toyota Corolla")).toBeInTheDocument();
     expect(screen.getByText("Ford Focus")).toBeInTheDocument();
   });
@@ -98,11 +98,11 @@ describe("MechanicRow", () => {
       />,
     );
 
-    // Znajdź pierwszy element wizyty i kliknij go
+    
     const appointmentElement = screen.getByText("Toyota Corolla");
     await user.click(appointmentElement);
 
-    // Sprawdź, czy funkcja onAppointmentClick została wywołana z odpowiednim ID
+    
     expect(onAppointmentClickMock).toHaveBeenCalledWith("1");
   });
 });

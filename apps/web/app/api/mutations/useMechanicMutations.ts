@@ -14,7 +14,7 @@ type UpdateMechanicOptions = {
   data: UpdateMechanicBody;
 };
 
-// Define a type for creating a user and mechanic together
+
 type CreateUserAndMechanicOptions = {
   user: CreateUserBody;
   mechanic: Omit<CreateMechanicBody, "userId">;
@@ -46,11 +46,11 @@ export function useCreateUserAndMechanic() {
 
   return useMutation({
     mutationFn: async (options: CreateUserAndMechanicOptions) => {
-      // Step 1: Create the user
+      
       const userResponse = await ApiClient.api.userControllerCreateUser(options.user);
       const userId = userResponse.data.data.id;
 
-      // Step 2: Create the mechanic with the new user ID
+      
       const mechanicResponse = await ApiClient.api.mechanicControllerCreateMechanic({
         ...options.mechanic,
         userId,

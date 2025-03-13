@@ -33,26 +33,20 @@ export const isMultiDayAppointment = (appointment: Omit<IAppointment, "mechanicI
   return !isSameDay(appointment.startDate, appointment.endDate);
 };
 
-// Calculates the duration between two dates within a single day
-// (if the appointments are multi-day, returns the duration to the end of the day or from the start of the day)
 export const calculateDurationForDay = (appointment: IAppointment, day: Date): number => {
   if (!appointment.startDate || !appointment.endDate) {
-    return appointment.duration || 60; // default duration
+    return appointment.duration || 60;
   }
 
   const startDate = new Date(appointment.startDate);
   const endDate = new Date(appointment.endDate);
 
-  // If the appointments are not multi-day and belong to the given day
   if (isSameDay(startDate, endDate) && isSameDay(startDate, day)) {
-    // Return the normal duration
     const durationMs = endDate.getTime() - startDate.getTime();
-    return Math.round(durationMs / (1000 * 60)); // convert milliseconds to minutes
+    return Math.round(durationMs / (1000 * 60));
   }
 
-  // If we have to work with the first day of the appointment
   if (isSameDay(startDate, day)) {
-    // Calculate the time from the start of the day (00:00) to the end
     const endOfDay = new Date(day);
     endOfDay.setHours(23, 59, 59, 999);
 
@@ -60,9 +54,7 @@ export const calculateDurationForDay = (appointment: IAppointment, day: Date): n
     return Math.round(durationMs / (1000 * 60));
   }
 
-  // If we have to work with the last day of the appointment
   if (isSameDay(endDate, day)) {
-    // Calculate the time from the start of the day (00:00) to the end
     const startOfDay = new Date(day);
     startOfDay.setHours(0, 0, 0, 0);
 
@@ -104,7 +96,7 @@ export const calculateDuration = (startDate: string, endDate: string): number =>
   }
 
   const durationMs = end.getTime() - start.getTime();
-  return Math.round(durationMs / (1000 * 60)); // convert milliseconds to minutes
+  return Math.round(durationMs / (1000 * 60));
 };
 
 export const convertMechanic = (mechanicFromAPI: MechanicAPI): IMechanic => {
@@ -153,7 +145,6 @@ export const convertOrder = (orderFromAPI: RepairOrderAPI): IAppointment => {
     }
   }
 
-  // Generate random color for the repair
   const colors = ["#3b82f680", "#8b5cf680", "#ef444480", "#10b98180", "#f59e0b80", "#6366f180"];
   const color = colors[Math.floor(Math.random() * colors.length)];
 

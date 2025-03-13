@@ -27,7 +27,6 @@ export const AppointmentForm = ({
 }: AppointmentFormProps) => {
   const [isOpen, setIsOpen] = useState(!!appointmentId);
 
-  // Set up the form with default values
   const form = useForm<AppointmentFormValues>({
     resolver: zodResolver(appointmentFormSchema),
     defaultValues: defaultValues || {
@@ -58,31 +57,26 @@ export const AppointmentForm = ({
     onClose?.();
   };
 
-  // Handle both open and close events
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open);
-    // When closing by clicking outside, also call onClose
+
     if (!open) {
       form.reset();
       onClose?.();
     }
   };
 
-  // Get appointment data for editing
   const { appointmentData, vehicleData, customerData, mechanics, isLoading, getFormattedTimes } =
     useAppointmentData(appointmentId);
 
-  // Set up mutation functions
   const { submitAppointment } = useAppointmentMutations(appointmentId, handleClose);
 
-  // Ensure sheet opens when appointmentId changes
   useEffect(() => {
     if (appointmentId) {
       setIsOpen(true);
     }
   }, [appointmentId]);
 
-  // Update form with appointment data when editing
   useEffect(() => {
     if (appointmentId && appointmentData && vehicleData && customerData) {
       const formattedTimes = getFormattedTimes();
@@ -100,7 +94,7 @@ export const AppointmentForm = ({
         endDate,
         endTime,
         mechanicId: appointmentData.assignedMechanicId || undefined,
-        // Fill in empty fields for completeness
+
         make: "",
         model: "",
         year: "",
@@ -114,12 +108,10 @@ export const AppointmentForm = ({
     }
   }, [appointmentId, appointmentData, vehicleData, customerData, form]);
 
-  // Handle form submission
   const onSubmit = async (data: AppointmentFormValues) => {
     try {
       await submitAppointment(data);
     } catch (error) {
-      // Error handling is done in the submitAppointment function
       console.error("Form submission error:", error);
     }
   };
@@ -147,16 +139,12 @@ export const AppointmentForm = ({
         ) : (
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
-              {/* Basic details section */}
               <BasicDetailsSection form={form} mechanics={mechanics} />
 
-              {/* Customer and vehicle section */}
               <CustomerSection form={form} />
 
-              {/* Date and time section */}
               <DateTimeSection form={form} />
 
-              {/* Form actions */}
               <div className="flex justify-end space-x-2 pt-4">
                 <Button type="button" variant="outline" onClick={handleClose}>
                   Cancel
