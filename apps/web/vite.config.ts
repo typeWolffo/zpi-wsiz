@@ -20,16 +20,5 @@ export default defineConfig({
       },
     },
   },
-  plugins: [reactRouter(), tsconfigPaths(), react()],
-  test: {
-    globals: true,
-    environment: "jsdom",
-    setupFiles: ["./vitest.setup.ts"],
-    coverage: {
-      provider: "v8",
-      reporter: ["text", "json", "html"],
-      exclude: ["**/*.test.{ts,tsx}", "**/__mocks__/**", "**/__tests__/**"],
-    },
-    exclude: [...configDefaults.exclude, "**/node_modules/**", "**/build/**"],
-  },
+  plugins: [reactRouter(), tsconfigPaths()],
 });
