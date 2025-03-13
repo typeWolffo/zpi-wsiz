@@ -9,4 +9,6 @@ export default [
     route("clients", "routes/Clients.tsx"),
   ]),
   route("login", "routes/Login.tsx"),
+  route("auth/create-new-password", "routes/auth/CreateNewPassword.tsx"),
+  route("auth/password-recovery", "routes/auth/PasswordRecovery.tsx"),
 ] satisfies RouteConfig;

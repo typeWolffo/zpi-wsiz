@@ -9,5 +9,5 @@ zpi.localhost {
 }
 
 mailbox.lms.localhost {
-	reverse_proxy localhost:8025
+	reverse_proxy localhost:8026
 }

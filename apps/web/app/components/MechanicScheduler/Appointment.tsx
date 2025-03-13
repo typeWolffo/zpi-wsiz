@@ -117,7 +117,7 @@ export const Appointment: React.FC<IAppointmentProps> = ({
 
   const formatDate = (date?: Date): string => {
     if (!date) return "";
-    return date.toLocaleString("pl-PL", {
+    return date.toLocaleString("en-US", {
       year: "numeric",
       month: "2-digit",
       day: "2-digit",
@@ -129,11 +129,11 @@ export const Appointment: React.FC<IAppointmentProps> = ({
   const tooltipContent = [
     car,
     description,
-    customerName ? `Klient: ${customerName}` : "",
-    registrationNumber ? `Nr rej.: ${registrationNumber}` : "",
-    startDate ? `Początek: ${formatDate(startDate)}` : "",
-    endDate ? `Koniec: ${formatDate(endDate)}` : "",
-    isMultiDay ? "Naprawa wielodniowa" : "",
+    customerName ? `Client: ${customerName}` : "",
+    registrationNumber ? `Reg. No.: ${registrationNumber}` : "",
+    startDate ? `Start: ${formatDate(startDate)}` : "",
+    endDate ? `End: ${formatDate(endDate)}` : "",
+    isMultiDay ? "Multi-day repair" : "",
   ]
     .filter(Boolean)
     .join("\n");
@@ -156,7 +156,6 @@ export const Appointment: React.FC<IAppointmentProps> = ({
     <div
       ref={(node) => {
         setNodeRef(node);
-        // @ts-ignore - we know this is safe
         appointmentRef.current = node;
       }}
       style={{
@@ -166,7 +165,7 @@ export const Appointment: React.FC<IAppointmentProps> = ({
         zIndex: isResizing ? 20 : 10,
         cursor: isResizing ? "ew-resize" : "pointer",
       }}
-      className="flex h-10 items-center justify-between overflow-hidden rounded px-2 text-white"
+      className="flex h-24 items-center justify-between overflow-hidden rounded px-2 text-white"
       title={tooltipContent}
       {...(isResizing ? {} : attributes)}
       {...(isResizing ? {} : listeners)}

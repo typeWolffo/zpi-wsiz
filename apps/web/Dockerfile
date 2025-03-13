@@ -1,26 +1,28 @@
-FROM node:20-alpine AS dependencies-env
-RUN npm i -g pnpm
-COPY . /app
+FROM node:20-alpine AS base
 
-FROM dependencies-env AS development-dependencies-env
-COPY ./package.json pnpm-lock.yaml /app/
 WORKDIR /app
-RUN pnpm i --frozen-lockfile
 
-FROM dependencies-env AS production-dependencies-env
-COPY ./package.json pnpm-lock.yaml /app/
-WORKDIR /app
-RUN pnpm i --prod --frozen-lockfile
+RUN npm install -g pnpm
 
-FROM dependencies-env AS build-env
-COPY ./package.json pnpm-lock.yaml /app/
-COPY --from=development-dependencies-env /app/node_modules /app/node_modules
+FROM base AS builder
 WORKDIR /app
-RUN pnpm build
 
-FROM dependencies-env
-COPY ./package.json pnpm-lock.yaml /app/
-COPY --from=production-dependencies-env /app/node_modules /app/node_modules
-COPY --from=build-env /app/build /app/build
-WORKDIR /app
-CMD ["pnpm", "start"]
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
+COPY apps/web/package.json ./apps/web/
+COPY packages/ ./packages/
+
+RUN pnpm install --frozen-lockfile
+
+COPY apps/web/ ./apps/web
+
+RUN pnpm --filter web generate:client || echo "Skipping API client generation"
+
+RUN pnpm --filter web build
+
+FROM nginx:alpine AS runner
+
+COPY --from=builder /app/apps/web/build/client /usr/share/nginx/html
+
+COPY --from=builder /app/apps/web/nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 8

@@ -1,6 +1,7 @@
-
 import { useAuthStore } from "~/store/authStore";
+import { useCurrentUserStore } from "~/store/useCurrentUserStore";
 import { API } from "./generated-api";
+import { queryClient } from "./queryClient";
 
 export const requestManager = {
   controller: new AbortController(),
@@ -34,6 +35,20 @@ ApiClient.instance.interceptors.response.use(
   (response) => response,
   async (error) => {
     if (error.config?.url?.includes("/logout")) {
+      return Promise.reject(error);
+    }
+
+    if (error.config?.url?.includes("/refresh") && error.response?.status === 403) {
+      useAuthStore.getState().setLoggedIn(false);
+
+      useCurrentUserStore.getState().setCurrentUser(undefined);
+
+      queryClient.clear();
+
+      requestManager.abortAll();
+
+      window.location.href = "/login";
+
       return Promise.reject(error);
     }
 

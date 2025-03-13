@@ -39,22 +39,22 @@ export default function Login() {
   };
 
   return (
-    <div>
+    <div className="flex h-screen items-center justify-center">
       <Card className="mx-auto max-w-sm">
         <CardHeader>
           <CardTitle role="heading" className="text-2xl">
-            Zaloguj się
+            Login
           </CardTitle>
-          <CardDescription>Wprowadź swoje dane, aby uzyskać dostęp do konta</CardDescription>
+          <CardDescription>Enter your credentials to access your account</CardDescription>
         </CardHeader>
         <CardContent>
           <form className="grid gap-4" onSubmit={handleSubmit(onSubmit)}>
             <div className="grid gap-2">
-              <Label htmlFor="email">Adres e-mail</Label>
+              <Label htmlFor="email">Email address</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="nazwa@przykład.pl"
+                placeholder="name@example.com"
                 className={cn({ "border-red-500": errors.email })}
                 {...register("email")}
               />
@@ -62,12 +62,12 @@ export default function Login() {
             </div>
             <div className="grid gap-2">
               <div className="flex items-center">
-                <Label htmlFor="password">Hasło</Label>
+                <Label htmlFor="password">Password</Label>
                 <Link
                   to="/auth/password-recovery"
                   className="ml-auto inline-block text-sm underline"
                 >
-                  Zapomniałeś hasła?
+                  Forgot password?
                 </Link>
               </div>
               <Input
@@ -89,19 +89,19 @@ export default function Login() {
                     htmlFor="rememberMe"
                     className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                   >
-                    Zapamiętaj mnie
+                    Remember me
                   </Label>
                 </div>
               )}
             />
             <Button type="submit" className="w-full">
-              Zaloguj się
+              Login
             </Button>
           </form>
           <div className="mt-4 text-center text-sm">
-            Nie masz jeszcze konta?{" "}
+            Don't have an account yet?{" "}
             <Link to="/auth/register" className="underline">
-              Zarejestruj się
+              Register
             </Link>
           </div>
         </CardContent>

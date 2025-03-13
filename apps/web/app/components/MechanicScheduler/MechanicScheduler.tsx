@@ -196,7 +196,11 @@ const MechanicScheduler: React.FC<MechanicSchedulerProps> = ({ mechanics, orders
       </div>
 
       {selectedAppointmentId && (
-        <AppointmentForm appointmentId={selectedAppointmentId} onClose={handleAppointmentClose} />
+        <AppointmentForm
+          key={selectedAppointmentId}
+          appointmentId={selectedAppointmentId}
+          onClose={handleAppointmentClose}
+        />
       )}
 
       <div className="mb-4 flex flex-col items-start">

@@ -1,8 +1,11 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable } from '@nestjs/common';
 
-import { ACCESS_TOKEN_EXPIRATION_TIME, REFRESH_TOKEN_EXPIRATION_TIME } from "./consts";
+import {
+  ACCESS_TOKEN_EXPIRATION_TIME,
+  REFRESH_TOKEN_EXPIRATION_TIME,
+} from './consts';
 
-import type { Response } from "express";
+import type { Response } from 'express';
 
 @Injectable()
 export class TokenService {
@@ -13,28 +16,32 @@ export class TokenService {
     rememberMe: boolean = false,
   ) {
     const oneMonthExpirationTime = 30 * 24 * 60 * 60 * 1000;
+    console.log({ rememberMe });
+    const accessTokenMaxAge = rememberMe
+      ? oneMonthExpirationTime
+      : ACCESS_TOKEN_EXPIRATION_TIME;
+    const refreshTokenMaxAge = rememberMe
+      ? oneMonthExpirationTime
+      : REFRESH_TOKEN_EXPIRATION_TIME;
 
-    const accessTokenMaxAge = rememberMe ? oneMonthExpirationTime : ACCESS_TOKEN_EXPIRATION_TIME;
-    const refreshTokenMaxAge = rememberMe ? oneMonthExpirationTime : REFRESH_TOKEN_EXPIRATION_TIME;
-
-    response.cookie("access_token", accessToken, {
+    response.cookie('access_token', accessToken, {
       httpOnly: true,
       secure: true,
-      sameSite: "strict",
+      sameSite: 'strict',
       maxAge: accessTokenMaxAge,
     });
 
-    response.cookie("refresh_token", refreshToken, {
+    response.cookie('refresh_token', refreshToken, {
       httpOnly: true,
       secure: true,
-      sameSite: "strict",
+      sameSite: 'strict',
       maxAge: refreshTokenMaxAge,
-      path: "/api/auth/refresh",
+      path: '/api/auth/refresh',
     });
   }
 
   clearTokenCookies(response: Response) {
-    response.clearCookie("access_token");
-    response.clearCookie("refresh_token");
+    response.clearCookie('access_token');
+    response.clearCookie('refresh_token');
   }
 }

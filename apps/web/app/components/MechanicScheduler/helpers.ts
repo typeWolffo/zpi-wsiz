@@ -37,7 +37,7 @@ export const isMultiDayAppointment = (appointment: Omit<IAppointment, "mechanicI
 // (if the appointments are multi-day, returns the duration to the end of the day or from the start of the day)
 export const calculateDurationForDay = (appointment: IAppointment, day: Date): number => {
   if (!appointment.startDate || !appointment.endDate) {
-    return appointment.duration || 60; // domyślna długość
+    return appointment.duration || 60; // default duration
   }
 
   const startDate = new Date(appointment.startDate);
@@ -149,11 +149,11 @@ export const convertOrder = (orderFromAPI: RepairOrderAPI): IAppointment => {
 
       duration = Math.max(15, duration);
     } catch (error) {
-      console.error("Błąd podczas parsowania dat:", error);
+      console.error("Error parsing dates:", error);
     }
   }
 
-  // Generujemy losowy kolor dla naprawy
+  // Generate random color for the repair
   const colors = ["#3b82f680", "#8b5cf680", "#ef444480", "#10b98180", "#f59e0b80", "#6366f180"];
   const color = colors[Math.floor(Math.random() * colors.length)];
 

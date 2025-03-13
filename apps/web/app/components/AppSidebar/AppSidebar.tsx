@@ -9,7 +9,7 @@ import {
 import { cn } from "~/lib/utils";
 
 const navLinkStyles = ({ isActive }: { isActive: boolean }) =>
-  cn("rounded-sm p-2", { "bg-blue-300": isActive });
+  cn("rounded-sm p-2", { "bg-primary text-primary-foreground": isActive });
 
 export function AppSidebar() {
   return (
@@ -17,23 +17,26 @@ export function AppSidebar() {
       <SidebarHeader />
       <SidebarContent>
         <nav className="flex flex-col gap-2 p-2">
-          <NavLink to="/" className={navLinkStyles} end>
-            Home
-          </NavLink>
-          <NavLink to="/clients" className={navLinkStyles} end>
-            Clients
-          </NavLink>
-          <NavLink to="/mechanics" className={navLinkStyles} end>
-            Mechanics
-          </NavLink>
-          <NavLink to="/vehicles" className={navLinkStyles} end>
-            Vehicles
-          </NavLink>
+          <SidebarGroup>
+            <NavLink to="/" className={navLinkStyles} end>
+              Home
+            </NavLink>
+            <NavLink to="/clients" className={navLinkStyles} end>
+              Clients
+            </NavLink>
+            <NavLink to="/mechanics" className={navLinkStyles} end>
+              Mechanics
+            </NavLink>
+            <NavLink to="/vehicles" className={navLinkStyles} end>
+              Vehicles
+            </NavLink>
+          </SidebarGroup>
+          <SidebarGroup>
+            <NavLink to="/settings" className={navLinkStyles} end>
+              Settings
+            </NavLink>
+          </SidebarGroup>
         </nav>
-        <SidebarGroup />
-        <NavLink to="/settings" className={navLinkStyles} end>
-          Settings
-        </NavLink>
       </SidebarContent>
       <SidebarFooter />
     </Sidebar>

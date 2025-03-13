@@ -18,7 +18,7 @@ export const MechanicRow: React.FC<IMechanicRowProps> = ({
   };
 
   return (
-    <div className="relative flex h-12 items-center border-b border-gray-200">
+    <div className="relative flex h-24 items-center border-b border-gray-200">
       <div className="flex h-full w-24 items-center border-r border-gray-300 px-2 font-medium capitalize text-gray-700">
         {mechanic.firstName} {mechanic.lastName}
       </div>

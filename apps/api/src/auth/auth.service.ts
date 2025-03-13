@@ -211,7 +211,7 @@ export class AuthService {
     const emailTemplate = new PasswordRecoveryEmail({
       email,
       name: email,
-      resetLink: `${CORS_ORIGIN}/auth/create-new-password?resetToken=${resetToken}&email=${email}`,
+      resetLink: `${process.env.CORS_ORIGIN}/auth/create-new-password?resetToken=${resetToken}&email=${email}`,
     });
 
     await this.emailService.sendEmail({
@@ -219,7 +219,7 @@ export class AuthService {
       subject: 'Password recovery',
       text: emailTemplate.text,
       html: emailTemplate.html,
-      from: 'godfather@selleo.com',
+      from: process.env.SES_EMAIL || '',
     });
   }
 
