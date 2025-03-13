@@ -53,3 +53,23 @@ export function useVehiclesSuspense() {
     select: (data: GetVehiclesResponse) => data.data,
   });
 }
+
+export function useVehicleByIdSuspense(id: string) {
+  if (!id) {
+    throw new Error("Vehicle ID is required");
+  }
+
+  return useSuspenseQuery({
+    ...vehicleByIdQueryOptions(id),
+  });
+}
+
+export function useVehiclesByCustomerIdSuspense(customerId: string) {
+  if (!customerId) {
+    throw new Error("Customer ID is required");
+  }
+
+  return useSuspenseQuery({
+    ...vehiclesByCustomerIdQueryOptions(customerId),
+  });
+}

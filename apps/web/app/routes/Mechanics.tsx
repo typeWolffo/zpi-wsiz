@@ -57,7 +57,8 @@ export default function Mechanics() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMechanic, setSelectedMechanic] = useState<Mechanic | null>(null);
 
-  const { data: mechanics, isLoading } = useMechanics();
+  const { data: mechanics, isLoading, isError, error: queryError } = useMechanics();
+
   const { mutate: deleteMechanic } = useDeleteMechanic();
   const { mutate: updateMechanic } = useUpdateMechanic();
   const { mutate: createUserAndMechanic } = useCreateUserAndMechanic();
@@ -132,7 +133,7 @@ export default function Mechanics() {
         firstName: data.firstName,
         lastName: data.lastName,
         email: data.email,
-        role: "employee", 
+        role: "employee",
       },
       mechanic: {
         shiftStart: data.shiftStart,
@@ -146,44 +147,46 @@ export default function Mechanics() {
     ? editForm.handleSubmit(onSubmitEdit)
     : createForm.handleSubmit(onSubmitCreate);
 
-  const columnHelper = createColumnHelper<Mechanic>();
+  const getColumns = () => {
+    const columnHelper = createColumnHelper<Mechanic>();
 
-  const columns: ColumnDef<Mechanic, any>[] = [
-    columnHelper.accessor("firstName", {
-      header: "First Name",
-      cell: (info) => info.getValue(),
-    }),
-    columnHelper.accessor("lastName", {
-      header: "Last Name",
-      cell: (info) => info.getValue(),
-    }),
-    columnHelper.accessor("shiftStart", {
-      header: "Shift Start",
-      cell: (info) => info.getValue(),
-    }),
-    columnHelper.accessor("shiftEnd", {
-      header: "Shift End",
-      cell: (info) => info.getValue(),
-    }),
-    columnHelper.accessor("createdAt", {
-      header: "Created At",
-      cell: (info) => new Date(info.getValue()).toLocaleDateString(),
-    }),
-    columnHelper.display({
-      id: "actions",
-      header: "Actions",
-      cell: (info) => (
-        <div className="flex space-x-2">
-          <Button variant="ghost" size="icon" onClick={() => handleEdit(info.row.original)}>
-            <Edit className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={() => handleDelete(info.row.original.id)}>
-            <Trash className="h-4 w-4" />
-          </Button>
-        </div>
-      ),
-    }),
-  ];
+    return [
+      columnHelper.accessor("firstName", {
+        header: "First Name",
+        cell: (info) => info.getValue(),
+      }),
+      columnHelper.accessor("lastName", {
+        header: "Last Name",
+        cell: (info) => info.getValue(),
+      }),
+      columnHelper.accessor("shiftStart", {
+        header: "Shift Start",
+        cell: (info) => info.getValue(),
+      }),
+      columnHelper.accessor("shiftEnd", {
+        header: "Shift End",
+        cell: (info) => info.getValue(),
+      }),
+      columnHelper.accessor("createdAt", {
+        header: "Created At",
+        cell: (info) => new Date(info.getValue()).toLocaleDateString(),
+      }),
+      columnHelper.display({
+        id: "actions",
+        header: "Actions",
+        cell: (info) => (
+          <div className="flex space-x-2">
+            <Button variant="ghost" size="icon" onClick={() => handleEdit(info.row.original)}>
+              <Edit className="h-4 w-4" />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={() => handleDelete(info.row.original.id)}>
+              <Trash className="h-4 w-4" />
+            </Button>
+          </div>
+        ),
+      }),
+    ] as ColumnDef<Mechanic, any>[];
+  };
 
   return (
     <div className="container mx-auto py-6">
@@ -196,7 +199,21 @@ export default function Mechanics() {
           </Button>
         </CardHeader>
         <CardContent>
-          <DataTable columns={columns} data={mechanics || []} isLoading={isLoading} />
+          {isError ? (
+            <div className="flex flex-col items-center justify-center p-8 text-red-500">
+              <div className="mb-2 text-lg font-semibold">Failed to load mechanics</div>
+              <div className="text-sm">
+                {queryError instanceof Error ? queryError.message : "Unknown error occurred"}
+              </div>
+              <Button variant="outline" className="mt-4" onClick={() => window.location.reload()}>
+                Try Again
+              </Button>
+            </div>
+          ) : isLoading ? (
+            <div className="flex justify-center p-8">Loading mechanics data...</div>
+          ) : (
+            <DataTable columns={getColumns()} data={mechanics || []} />
+          )}
         </CardContent>
       </Card>
 
@@ -256,84 +273,78 @@ export default function Mechanics() {
                   <SheetClose asChild>
                     <Button variant="outline">Cancel</Button>
                   </SheetClose>
-                  <Button type="submit">Save Changes</Button>
+                  <Button type="submit">Save</Button>
                 </SheetFooter>
               </form>
             </Form>
           ) : (
             <Form {...createForm}>
               <form onSubmit={onSubmit} className="space-y-4 py-4">
-                <div className="space-y-4 border-b pb-4">
-                  <h3 className="text-sm font-medium">User Information</h3>
-                  <FormField
-                    control={createForm.control}
-                    name="firstName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>First Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="First Name" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={createForm.control}
-                    name="lastName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Last Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Last Name" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={createForm.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input type="email" placeholder="Email" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="space-y-4 pt-2">
-                  <h3 className="text-sm font-medium">Schedule Information</h3>
-                  <FormField
-                    control={createForm.control}
-                    name="shiftStart"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Shift Start Time</FormLabel>
-                        <FormControl>
-                          <Input type="time" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={createForm.control}
-                    name="shiftEnd"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Shift End Time</FormLabel>
-                        <FormControl>
-                          <Input type="time" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                <FormField
+                  control={createForm.control}
+                  name="firstName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>First Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="First Name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={createForm.control}
+                  name="lastName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Last Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Last Name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={createForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input type="email" placeholder="Email" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={createForm.control}
+                  name="shiftStart"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Shift Start Time</FormLabel>
+                      <FormControl>
+                        <Input type="time" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={createForm.control}
+                  name="shiftEnd"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Shift End Time</FormLabel>
+                      <FormControl>
+                        <Input type="time" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <SheetFooter>
                   <SheetClose asChild>
                     <Button variant="outline">Cancel</Button>

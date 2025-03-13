@@ -32,6 +32,9 @@ import type { IAppointment, MechanicSchedulerProps } from "./types";
 const MechanicScheduler: React.FC<MechanicSchedulerProps> = ({ mechanics, orders }) => {
   const { mutateAsync: updateRepairOrder } = useUpdateRepairOrder();
 
+  const safeMechanics = Array.isArray(mechanics) ? mechanics : [];
+  const safeOrders = Array.isArray(orders) ? orders : [];
+
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(null);
 
@@ -40,11 +43,14 @@ const MechanicScheduler: React.FC<MechanicSchedulerProps> = ({ mechanics, orders
   const [activeAppointment, setActiveAppointment] = useState<IAppointment | null>(null);
 
   const convertedMechanics = useMemo(
-    () => mechanics.map((mechanic) => convertMechanic(mechanic)),
-    [mechanics],
+    () => safeMechanics.map((mechanic) => convertMechanic(mechanic)),
+    [safeMechanics],
   );
 
-  const allAppointments = useMemo(() => orders.map((order) => convertOrder(order)), [orders]);
+  const allAppointments = useMemo(
+    () => safeOrders.map((order) => convertOrder(order)),
+    [safeOrders],
+  );
 
   const appointmentsForSelectedDay = useMemo(() => {
     return getAppointmentsForDate(allAppointments, selectedDate);

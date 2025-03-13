@@ -39,23 +39,23 @@ export function useAppointmentData(appointmentId?: string) {
     enabled: !!vehicleData?.customerId,
   });
 
-  const { data: mechanics } = useQuery({
+  const { data: mechanicsData } = useQuery({
     queryKey: ["mechanics"],
     queryFn: async () => {
       const response = await ApiClient.api.mechanicControllerGetMechanics();
-      return response.data.data;
+      return response.data;
     },
   });
 
+  const mechanics = mechanicsData?.data ?? [];
+
   const isLoading = isLoadingAppointment || isLoadingVehicle || isLoadingCustomer;
 
-  
   const roundToNearestTimeSlot = (date: Date) => {
     const hours = date.getHours();
     const minutes = date.getMinutes();
     const roundedMinutes = Math.round(minutes / 15) * 15;
 
-    
     let adjustedHours = hours;
     let adjustedMinutes = roundedMinutes;
 
@@ -64,13 +64,11 @@ export function useAppointmentData(appointmentId?: string) {
       adjustedMinutes = 0;
     }
 
-    
     adjustedHours = Math.max(7, Math.min(18, adjustedHours));
 
     return `${String(adjustedHours).padStart(2, "0")}:${String(adjustedMinutes).padStart(2, "0")}`;
   };
 
-  
   const getFormattedTimes = useMemo(() => {
     return () => {
       if (!appointmentData) return null;

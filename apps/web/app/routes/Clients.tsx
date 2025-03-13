@@ -1,19 +1,18 @@
-import React, { useState } from "react";
-import { createColumnHelper, type ColumnDef } from "@tanstack/react-table";
-import { Link } from "react-router";
-import { toast } from "sonner";
-import { Edit, Trash, Plus, Car } from "lucide-react";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { createColumnHelper, type ColumnDef } from "@tanstack/react-table";
+import { Car, Edit, Plus, Trash } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import * as z from "zod";
 
-import { useCustomers } from "~/api/queries/getCustomers";
-import { useVehiclesByCustomerId } from "~/api/queries/getVehicles";
+import type { GetCustomersResponse } from "~/api/generated-api";
 import {
-  useDeleteCustomer,
   useCreateCustomer,
+  useDeleteCustomer,
   useUpdateCustomer,
 } from "~/api/mutations/useCustomerMutations";
+import { useCustomers } from "~/api/queries/getCustomers";
+import { useVehiclesByCustomerId } from "~/api/queries/getVehicles";
 import { DataTable } from "~/components/DataTable";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
@@ -35,14 +34,13 @@ import {
 import { Input } from "~/components/ui/input";
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetDescription,
+  SheetFooter,
   SheetHeader,
   SheetTitle,
-  SheetFooter,
-  SheetClose,
 } from "~/components/ui/sheet";
-import type { GetCustomersResponse } from "~/api/generated-api";
 
 type Customer = GetCustomersResponse["data"][number];
 
@@ -55,16 +53,38 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
+function ClientsTableError({ error }: { error: Error }) {
+  return (
+    <div className="flex flex-col items-center justify-center p-8 text-red-500">
+      <div className="mb-2 text-lg font-semibold">Failed to load clients</div>
+      <div className="text-sm">{error.message}</div>
+      <Button variant="outline" className="mt-4" onClick={() => window.location.reload()}>
+        Try Again
+      </Button>
+    </div>
+  );
+}
+
 export default function Clients() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [isVehiclesDialogOpen, setIsVehiclesDialogOpen] = useState(false);
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
+  const [error, setError] = useState<Error | null>(null);
 
-  const { data: customers, isLoading } = useCustomers();
+  const { data: customers, isLoading, isError, error: queryError } = useCustomers();
   const { data: customerVehicles, isLoading: isVehiclesLoading } = useVehiclesByCustomerId(
     selectedCustomerId || "",
   );
+
+  useEffect(() => {
+    if (isError && queryError) {
+      setError(queryError instanceof Error ? queryError : new Error("Failed to load clients"));
+    } else {
+      setError(null);
+    }
+  }, [isError, queryError]);
+
   const { mutate: deleteCustomer } = useDeleteCustomer();
   const { mutate: createCustomer } = useCreateCustomer();
   const { mutate: updateCustomer } = useUpdateCustomer();
@@ -225,14 +245,18 @@ export default function Clients() {
     <div className="container mx-auto py-6">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Customers</CardTitle>
+          <CardTitle>Clients</CardTitle>
           <Button onClick={handleAdd}>
             <Plus className="mr-2 h-4 w-4" />
-            Add Customer
+            Add Client
           </Button>
         </CardHeader>
         <CardContent>
-          <DataTable columns={columns} data={customers || []} isLoading={isLoading} />
+          {error ? (
+            <ClientsTableError error={error} />
+          ) : (
+            <DataTable columns={columns} data={customers || []} isLoading={isLoading} />
+          )}
         </CardContent>
       </Card>
 

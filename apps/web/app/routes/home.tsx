@@ -15,7 +15,10 @@ export function meta({}: Route.MetaArgs) {
 export const clientLoader = async () => {
   const mechanics = await queryClient.fetchQuery(mechanicQueryOptions);
   const orders = await queryClient.fetchQuery(ordersQueryOptions);
-  return { mechanics: mechanics.data, orders: orders.data };
+  return {
+    mechanics: Array.isArray(mechanics.data) ? mechanics.data : [],
+    orders: orders.data,
+  };
 };
 
 export default function Home() {

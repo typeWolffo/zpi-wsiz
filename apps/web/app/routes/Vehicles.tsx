@@ -11,7 +11,7 @@ import {
   useDeleteVehicle,
   useUpdateVehicle,
 } from "~/api/mutations/useVehicleMutations";
-import { useCustomerById } from "~/api/queries/getCustomers";
+import { useCustomerById, useCustomers } from "~/api/queries/getCustomers";
 import { useVehicles } from "~/api/queries/getVehicles";
 import { DataTable } from "~/components/DataTable";
 import { Button } from "~/components/ui/button";
@@ -32,6 +32,13 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
 import {
   Sheet,
   SheetClose,
@@ -61,7 +68,8 @@ export default function Vehicles() {
   const [isCustomerDialogOpen, setIsCustomerDialogOpen] = useState(false);
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
 
-  const { data: vehicles, isLoading } = useVehicles();
+  const { data: vehicles, isLoading, isError, error: queryError } = useVehicles();
+  const { data: customers } = useCustomers();
   const { data: selectedCustomer, isLoading: isCustomerLoading } = useCustomerById(
     selectedCustomerId || "",
   );
@@ -146,67 +154,69 @@ export default function Vehicles() {
     setIsModalOpen(false);
   };
 
-  const columnHelper = createColumnHelper<Vehicle>();
+  const getColumns = () => {
+    const columnHelper = createColumnHelper<Vehicle>();
 
-  const columns: ColumnDef<Vehicle, any>[] = [
-    columnHelper.accessor("make", {
-      header: "Make",
-      cell: (info) => info.getValue(),
-    }),
-    columnHelper.accessor("model", {
-      header: "Model",
-      cell: (info) => info.getValue(),
-    }),
-    columnHelper.accessor("year", {
-      header: "Year",
-      cell: (info) => info.getValue(),
-    }),
-    columnHelper.accessor("registrationNumber", {
-      header: "Registration",
-      cell: (info) => info.getValue(),
-    }),
-    columnHelper.accessor((row) => `${row.firstName} ${row.lastName}`, {
-      id: "customerName",
-      header: "Customer",
-      cell: (info) => info.getValue(),
-    }),
-    columnHelper.accessor("createdAt", {
-      header: "Created At",
-      cell: (info) => new Date(info.getValue()).toLocaleDateString(),
-    }),
-    columnHelper.display({
-      id: "actions",
-      header: "Actions",
-      cell: (info) => (
-        <div className="flex space-x-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => handleViewCustomer(info.row.original.customerId)}
-            title="View Customer"
-          >
-            <User className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => handleEdit(info.row.original)}
-            title="Edit Vehicle"
-          >
-            <Edit className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => handleDelete(info.row.original.id)}
-            title="Delete Vehicle"
-          >
-            <Trash className="h-4 w-4" />
-          </Button>
-        </div>
-      ),
-    }),
-  ];
+    return [
+      columnHelper.accessor("make", {
+        header: "Make",
+        cell: (info) => info.getValue(),
+      }),
+      columnHelper.accessor("model", {
+        header: "Model",
+        cell: (info) => info.getValue(),
+      }),
+      columnHelper.accessor("year", {
+        header: "Year",
+        cell: (info) => info.getValue(),
+      }),
+      columnHelper.accessor("registrationNumber", {
+        header: "Registration",
+        cell: (info) => info.getValue(),
+      }),
+      columnHelper.accessor((row) => `${row.firstName} ${row.lastName}`, {
+        id: "customerName",
+        header: "Customer",
+        cell: (info) => info.getValue(),
+      }),
+      columnHelper.accessor("createdAt", {
+        header: "Created At",
+        cell: (info) => new Date(info.getValue()).toLocaleDateString(),
+      }),
+      columnHelper.display({
+        id: "actions",
+        header: "Actions",
+        cell: (info) => (
+          <div className="flex space-x-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleViewCustomer(info.row.original.customerId)}
+              title="View Customer"
+            >
+              <User className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleEdit(info.row.original)}
+              title="Edit Vehicle"
+            >
+              <Edit className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleDelete(info.row.original.id)}
+              title="Delete Vehicle"
+            >
+              <Trash className="h-4 w-4" />
+            </Button>
+          </div>
+        ),
+      }),
+    ] as ColumnDef<Vehicle, any>[];
+  };
 
   return (
     <div className="container mx-auto py-6">
@@ -219,7 +229,21 @@ export default function Vehicles() {
           </Button>
         </CardHeader>
         <CardContent>
-          <DataTable columns={columns} data={vehicles || []} isLoading={isLoading} />
+          {isError ? (
+            <div className="flex flex-col items-center justify-center p-8 text-red-500">
+              <div className="mb-2 text-lg font-semibold">Failed to load vehicles</div>
+              <div className="text-sm">
+                {queryError instanceof Error ? queryError.message : "Unknown error occurred"}
+              </div>
+              <Button variant="outline" className="mt-4" onClick={() => window.location.reload()}>
+                Try Again
+              </Button>
+            </div>
+          ) : isLoading ? (
+            <div className="flex justify-center p-8">Loading vehicles data...</div>
+          ) : (
+            <DataTable columns={getColumns()} data={vehicles || []} />
+          )}
         </CardContent>
       </Card>
 
@@ -305,10 +329,21 @@ export default function Vehicles() {
                 name="customerId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Customer ID</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Customer ID" {...field} />
-                    </FormControl>
+                    <FormLabel>Customer</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a customer" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {customers?.map((customer) => (
+                          <SelectItem key={customer.id} value={customer.id}>
+                            {customer.firstName} {customer.lastName} ({customer.email})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -334,7 +369,7 @@ export default function Vehicles() {
             <div className="flex items-center justify-center py-8">Loading customer details...</div>
           ) : selectedCustomer ? (
             <div className="mt-4 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4 gap-x-48">
                 <div>
                   <h3 className="text-sm font-medium text-gray-500">First Name</h3>
                   <p className="mt-1">{selectedCustomer.data.firstName}</p>

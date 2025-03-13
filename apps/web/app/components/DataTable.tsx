@@ -23,17 +23,21 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   isLoading?: boolean;
+  isError?: boolean;
+  errorMessage?: string;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   isLoading = false,
+  isError = false,
+  errorMessage = "An error occurred while loading data.",
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
 
   const table = useReactTable({
-    data,
+    data: data || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -46,6 +50,10 @@ export function DataTable<TData, TValue>({
 
   if (isLoading) {
     return <div className="flex justify-center p-4">Loading...</div>;
+  }
+
+  if (isError) {
+    return <div className="flex justify-center p-4 text-red-500">{errorMessage}</div>;
   }
 
   return (
