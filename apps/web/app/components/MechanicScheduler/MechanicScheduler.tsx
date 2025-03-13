@@ -14,7 +14,8 @@ import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { ChevronDown } from "lucide-react";
 import React, { useEffect, useMemo, useState } from "react";
 import { useUpdateRepairOrder } from "~/api/mutations/useUpdateOrder";
-import { ordersQueryOptions } from "~/api/queries/getOrders";
+import { ordersQueryOptions, useOrders } from "~/api/queries/getOrders";
+import { useMechanics } from "~/api/queries/getMechanics";
 import { queryClient } from "~/api/queryClient";
 import { AppointmentForm } from "../AppointmentForm/AppointmentForm";
 import { Calendar } from "../ui/calendar";
@@ -27,16 +28,18 @@ import {
   generateTimeSlots,
   getAppointmentsForDate,
 } from "./helpers";
-import type { IAppointment, MechanicSchedulerProps } from "./types";
+import type { IAppointment } from "./types";
 import { useCurrentUserStore } from "~/store/useCurrentUserStore";
 
-const MechanicScheduler: React.FC<MechanicSchedulerProps> = ({ mechanics, orders }) => {
+const MechanicScheduler: React.FC = () => {
   const { mutateAsync: updateRepairOrder } = useUpdateRepairOrder();
+  const { data: mechanicsData } = useMechanics();
+  const { data: ordersData } = useOrders();
   const currentUser = useCurrentUserStore((state) => state.currentUser);
   const isEmployee = currentUser?.role === "employee";
 
-  const safeMechanics = Array.isArray(mechanics) ? mechanics : [];
-  const safeOrders = Array.isArray(orders) ? orders : [];
+  const safeMechanics = Array.isArray(mechanicsData) ? mechanicsData : [];
+  const safeOrders = Array.isArray(ordersData) ? ordersData : [];
 
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(null);
@@ -114,18 +117,14 @@ const MechanicScheduler: React.FC<MechanicSchedulerProps> = ({ mechanics, orders
         data: {
           assignedMechanicId: over.data.current.mechanicId,
         },
-      })
-        .then(() => {
-          queryClient.invalidateQueries(ordersQueryOptions);
-        })
-        .catch((error) => {
-          console.error("Error updating appointment:", error);
-          setAppointments((prev) =>
-            prev.map((app) =>
-              app.id === draggedId ? { ...app, mechanicId: draggedAppointment.mechanicId } : app,
-            ),
-          );
-        });
+      }).catch((error) => {
+        console.error("Error updating appointment:", error);
+        setAppointments((prev) =>
+          prev.map((app) =>
+            app.id === draggedId ? { ...app, mechanicId: draggedAppointment.mechanicId } : app,
+          ),
+        );
+      });
     }
 
     setActiveId(null);

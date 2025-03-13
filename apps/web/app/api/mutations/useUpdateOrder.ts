@@ -5,6 +5,8 @@ import { toast } from "sonner";
 
 import { ApiClient } from "../api-client";
 import type { UpdateRepairOrderBody } from "../generated-api";
+import { ordersQueryOptions } from "../queries/getOrders";
+import { queryClient } from "../queryClient";
 
 type EnrollCourseOptions = {
   id: string;
@@ -23,6 +25,7 @@ export function useUpdateRepairOrder() {
     },
     onSuccess: () => {
       toast.success("Successfully updated repair order");
+      queryClient.invalidateQueries(ordersQueryOptions);
     },
     onError: (error) => {
       if (error instanceof AxiosError) {
