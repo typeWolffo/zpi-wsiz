@@ -48,7 +48,7 @@ ZPI2024 project is a fullstack application with a monorepo architecture, built u
 ### 1. Cloning the repository
 
 ```bash
-git clone [repository-address]
+git clone git@github.com:typeWolffo/zpi-wsiz.git
 cd zpi2024
 ```
 
@@ -86,10 +86,10 @@ pnpm dev
 
 After completing the above steps:
 
-- Frontend will be available at: http://localhost:3000
-- API will be available at: http://localhost:3001
-- API documentation (Swagger): http://localhost:3001/api
-- Mailhog (email testing interface): http://localhost:8026
+- Frontend will be available at: [https://zpi.localhost](https://zpi.localhost)
+- API will be available at: [https://zpi.localhost/api](https://zpi.localhost/api)
+- API documentation (Swagger): [https://localhost:3001/api/docs](https://localhost:3001/api/docs)
+- Mailhog (email testing interface): [https://mailbox.zpi.localhost](https://mailbox.zpi.localhost)
 
 ## Project structure
 
