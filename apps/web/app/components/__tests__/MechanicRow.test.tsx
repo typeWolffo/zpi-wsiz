@@ -4,19 +4,16 @@ import { renderWithRouter, screen } from "../../utils/test-utils";
 import type { ITimeStart, IMechanic, IAppointment } from "../MechanicScheduler/types";
 
 describe("MechanicRow", () => {
-  
   const shiftStart: ITimeStart = {
     hour: 9,
     minute: 0,
   };
 
-  
   const shiftEnd: ITimeStart = {
     hour: 17,
     minute: 0,
   };
 
-  
   const mechanic: IMechanic = {
     id: "1",
     firstName: "Jan",
@@ -25,7 +22,6 @@ describe("MechanicRow", () => {
     shiftEnd,
   };
 
-  
   const appointments: IAppointment[] = [
     {
       id: "1",
@@ -34,7 +30,7 @@ describe("MechanicRow", () => {
         hour: 10,
         minute: 0,
       },
-      duration: 60, 
+      duration: 60,
       description: "Wymiana oleju",
       customerName: "Adam Nowak",
       registrationNumber: "ABC 1234",
@@ -47,7 +43,7 @@ describe("MechanicRow", () => {
         hour: 14,
         minute: 30,
       },
-      duration: 90, 
+      duration: 90,
       description: "Naprawa zawieszenia",
       customerName: "Anna Wiśniewska",
       registrationNumber: "DEF 5678",
@@ -55,7 +51,6 @@ describe("MechanicRow", () => {
     },
   ];
 
-  
   const onResizeMock = vi.fn();
   const onAppointmentClickMock = vi.fn();
 
@@ -66,10 +61,10 @@ describe("MechanicRow", () => {
         appointments={appointments}
         onResize={onResizeMock}
         onAppointmentClick={onAppointmentClickMock}
+        isEmployee={false}
       />,
     );
 
-    
     expect(screen.getByText("Jan Kowalski")).toBeInTheDocument();
   });
 
@@ -80,10 +75,10 @@ describe("MechanicRow", () => {
         appointments={appointments}
         onResize={onResizeMock}
         onAppointmentClick={onAppointmentClickMock}
+        isEmployee={false}
       />,
     );
 
-    
     expect(screen.getByText("Toyota Corolla")).toBeInTheDocument();
     expect(screen.getByText("Ford Focus")).toBeInTheDocument();
   });
@@ -95,14 +90,13 @@ describe("MechanicRow", () => {
         appointments={appointments}
         onResize={onResizeMock}
         onAppointmentClick={onAppointmentClickMock}
+        isEmployee={false}
       />,
     );
 
-    
     const appointmentElement = screen.getByText("Toyota Corolla");
     await user.click(appointmentElement);
 
-    
     expect(onAppointmentClickMock).toHaveBeenCalledWith("1");
   });
 });

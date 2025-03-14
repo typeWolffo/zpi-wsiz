@@ -3,7 +3,6 @@ import { Appointment } from "../MechanicScheduler/Appointment";
 import { renderWithRouter, screen } from "../../utils/test-utils";
 import type { ITimeStart } from "../MechanicScheduler/types";
 
-
 vi.mock("@dnd-kit/core", () => ({
   useDraggable: () => ({
     attributes: {},
@@ -22,7 +21,6 @@ vi.mock("@dnd-kit/core", () => ({
 }));
 
 describe("Appointment", () => {
-  
   const appointmentProps = {
     id: "1",
     car: "Toyota Corolla",
@@ -38,6 +36,7 @@ describe("Appointment", () => {
     color: "#f87171",
     onResize: vi.fn(),
     onClick: vi.fn(),
+    isEmployee: true,
   };
 
   it("renders the appointment with car name", () => {
@@ -47,7 +46,6 @@ describe("Appointment", () => {
       </div>,
     );
 
-    
     expect(container.textContent).toContain("Toyota Corolla");
   });
 
@@ -58,7 +56,6 @@ describe("Appointment", () => {
       </div>,
     );
 
-    
     expect(container.textContent).toContain("Adam Nowak");
   });
 
@@ -69,7 +66,6 @@ describe("Appointment", () => {
       </div>,
     );
 
-    
     expect(container.textContent).toContain("ABC 1234");
   });
 
@@ -82,12 +78,10 @@ describe("Appointment", () => {
       </div>,
     );
 
-    
     const appointmentElement = container.querySelector(".flex.h-24");
     if (appointmentElement) {
       await user.click(appointmentElement);
 
-      
       expect(onClickMock).toHaveBeenCalledWith("1");
     }
   });

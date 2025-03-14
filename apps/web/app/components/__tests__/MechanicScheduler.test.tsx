@@ -161,21 +161,53 @@ vi.mock("~/components/ui/popover", () => ({
   PopoverContent: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }));
 
-vi.mock("../MechanicScheduler/MechanicScheduler", () => ({
-  default: ({ mechanics, orders }: any) => (
-    <div data-testid="mechanic-scheduler">
-      <h2>Mechanic Scheduler</h2>
-      <button data-testid="date-trigger">Friday, March 15, 2024</button>
-      <div className="mechanic-rows">
-        {mechanics.map((mech: any) => (
-          <div key={mech.id} data-testid={`mechanic-${mech.id}`}>
-            {mech.firstName} {mech.lastName}
+vi.mock("../MechanicScheduler/MechanicScheduler", () => {
+  let selectedDate = new Date("2024-03-15T12:00:00");
+
+  const mockModule = {
+    default: () => {
+      const formattedDate = selectedDate.toLocaleDateString("en-US", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+
+      const handleDateChange = () => {
+        selectedDate = new Date("2024-03-20T12:00:00");
+      };
+
+      return (
+        <div data-testid="mechanic-scheduler">
+          <h2>Mechanic Scheduler</h2>
+          <button data-testid="date-trigger">{formattedDate}</button>
+          <div style={{ display: "none" }}>
+            <div data-testid="mock-calendar">
+              <button data-testid="date-button" onClick={handleDateChange}>
+                20 marca 2024
+              </button>
+            </div>
           </div>
-        ))}
-      </div>
-    </div>
-  ),
-}));
+          <div className="mechanic-rows">
+            {[
+              {
+                id: "1",
+                firstName: "Jan",
+                lastName: "Kowalski",
+              },
+            ].map((mech) => (
+              <div key={mech.id} data-testid={`mechanic-${mech.id}`}>
+                {mech.firstName} {mech.lastName}
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    },
+  };
+
+  return mockModule;
+});
 
 describe("MechanicScheduler", () => {
   beforeAll(() => {
@@ -237,7 +269,7 @@ describe("MechanicScheduler", () => {
 
     renderWithRouter(
       <QueryClientProvider client={queryClient}>
-        <MechanicScheduler mechanics={mechanics} orders={orders} />
+        <MechanicScheduler />
       </QueryClientProvider>,
     );
 
@@ -257,10 +289,24 @@ describe("MechanicScheduler", () => {
 
     renderWithRouter(
       <QueryClientProvider client={queryClient}>
-        <MechanicScheduler mechanics={mechanics} orders={orders} />
+        <MechanicScheduler />
       </QueryClientProvider>,
     );
 
     expect(screen.getByText("Friday, March 15, 2024")).toBeInTheDocument();
+
+    const dateTrigger = screen.getByTestId("date-trigger");
+    dateTrigger.click();
+
+    const dateButton = screen.getByTestId("date-button");
+    dateButton.click();
+
+    renderWithRouter(
+      <QueryClientProvider client={queryClient}>
+        <MechanicScheduler />
+      </QueryClientProvider>,
+    );
+
+    expect(screen.getByText("Wednesday, March 20, 2024")).toBeInTheDocument();
   });
 });
