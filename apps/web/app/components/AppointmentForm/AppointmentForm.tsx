@@ -20,6 +20,7 @@ import { useAppointmentData } from "./hooks/useAppointmentData";
 import { useAppointmentMutations } from "./hooks/useAppointmentMutations";
 import { useCurrentUserStore } from "~/store/useCurrentUserStore";
 import { Loader2 } from "lucide-react";
+import { ScrollArea } from "../ui/scroll-area";
 
 export const AppointmentForm = ({
   appointmentId,
@@ -143,6 +144,7 @@ export const AppointmentForm = ({
             <Button variant="outline">New Appointment</Button>
           </SheetTrigger>
         ) : null}
+
         <SheetContent className="w-[640px]">
           <SheetHeader>
             <SheetTitle>{appointmentId ? "Edit Appointment" : "New Appointment"}</SheetTitle>
@@ -160,26 +162,28 @@ export const AppointmentForm = ({
               </div>
             </div>
           ) : (
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
-                <BasicDetailsSection form={form} mechanics={mechanics} isEmployee={isEmployee} />
+            <ScrollArea className="h-full px-4 pb-10">
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
+                  <BasicDetailsSection form={form} mechanics={mechanics} isEmployee={isEmployee} />
 
-                <CustomerSection form={form} isEmployee={isEmployee} />
+                  <CustomerSection form={form} isEmployee={isEmployee} />
 
-                <DateTimeSection form={form} isEmployee={isEmployee} />
+                  <DateTimeSection form={form} isEmployee={isEmployee} />
 
-                <div className="flex justify-end space-x-2 pt-4">
-                  <Button type="button" variant="outline" onClick={handleClose}>
-                    Cancel
-                  </Button>
-                  {!isEmployee && (
-                    <Button type="submit">
-                      {appointmentId ? "Update Appointment" : "Create Appointment"}
+                  <div className="flex justify-end space-x-2 pt-4">
+                    <Button type="button" variant="outline" onClick={handleClose}>
+                      Cancel
                     </Button>
-                  )}
-                </div>
-              </form>
-            </Form>
+                    {!isEmployee && (
+                      <Button type="submit">
+                        {appointmentId ? "Update Appointment" : "Create Appointment"}
+                      </Button>
+                    )}
+                  </div>
+                </form>
+              </Form>
+            </ScrollArea>
           )}
         </SheetContent>
       </Sheet>
